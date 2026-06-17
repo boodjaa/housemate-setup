@@ -105,6 +105,12 @@ def validate_config(config: dict[str, Any]) -> None:
     if not (1 <= port <= 65535):
         raise ConfigError(f"homebridge.port must be between 1 and 65535, got {port}")
     pin = _require(homebridge, "pin", "homebridge")
+    _require_type(ui_port, int, "ui_port", "homebridge")
+    ui_port = _require(homebridge, "ui_port", "homebridge")
+    if not (1 <= ui_port <= 65535):
+        raise ConfigError(f"homebridge.port must be between 1 and 65535, got {port}")
+    if not (ui_port != port):
+        raise ConfigError(f"homebridge.ui_port cannot be the same as homebridge.port!!")
     _require_type(pin, str, "pin", "homebridge")
     if not _PIN_PATTERN.match(pin):
         raise ConfigError(

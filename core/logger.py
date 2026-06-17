@@ -24,7 +24,7 @@ def setup_logger(log_path: str | None = None, verbose: bool = False) -> logging.
     running without root, or during --dry-run on a non-Pi machine), falls
     back to ./logs/hub-setup.log so the run is still recorded.
     """
-    logger = logging.getLogger("pi_appliance")
+    logger = logging.getLogger("House-Mate Setup")
     logger.setLevel(logging.DEBUG)
     logger.handlers.clear()
 

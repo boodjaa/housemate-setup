@@ -12,8 +12,9 @@ base:
 
 homebridge:
   client_id: default
-  port: 8581
+  port: 51826
   pin: "123-45-678"
+  ui_port: 8581
 
   plugins:
     homebridge-shelly:
