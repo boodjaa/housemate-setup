@@ -11,7 +11,7 @@ system:
   vnc: true
 
 homebridge:
-  bridge_name: House-Mate
+  client_id: default
   port: 8581
   pin: "123-45-678"
 

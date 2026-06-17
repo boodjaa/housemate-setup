@@ -61,9 +61,10 @@ class HomebridgeModule(Module):
     def configure(self) -> bool:
         plugins = self.settings.get("plugins", {})
         context = {
-            "bridge_name": self.settings["bridge_name"],
+            "bridge_name": "Homebridge " + self.settings["client_id"],
             "port": self.settings["port"],
-            "pin": self.settings["pin"]
+            "pin": self.settings["pin"],
+            "username": self.settings["client_id"]
         }
         changed = self.templates.render_to_file("homebridge/config.json.j2", context, CONFIG_PATH)
 
