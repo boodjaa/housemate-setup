@@ -13,16 +13,18 @@ modules/mqtt.py with an MqttModule class, registering it here is the
 
 from __future__ import annotations
 
+from modules.sysconfig import SysconfigModule
 from modules.homebridge import HomebridgeModule
 from modules.wireguard import WireGuardModule
 
 MODULE_REGISTRY: dict[str, type] = {
-    "homebridge": HomebridgeModule,
-    "wireguard": WireGuardModule,
+    "system": SysconfigModule,
+    # "homebridge": HomebridgeModule,
+    # "wireguard": WireGuardModule,
     # "mqtt": MqttModule,            # not yet implemented
     # "pai": PaiModule,               # not yet implemented
     # "sprinklerd": SprinklerDModule, # not yet implemented
     # "aqualinkd": AqualinkDModule,   # not yet implemented
 }
 
-NOT_YET_IMPLEMENTED = {"mqtt", "pai", "sprinklerd", "aqualinkd"} - set(MODULE_REGISTRY)
+NOT_YET_IMPLEMENTED = {"homebridge", "wireguard", "mqtt", "pai", "sprinklerd", "aqualinkd"} - set(MODULE_REGISTRY)

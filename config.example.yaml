@@ -8,6 +8,10 @@
 # sprinklerd / aqualinkd -- they're left commented out below as a preview
 # of where they'll plug in once added.
 
+system:
+  hostname: PI_FOUR
+  vnc: true
+
 homebridge:
   bridge_name: Pool Hub
   port: 8581
