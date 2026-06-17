@@ -17,7 +17,7 @@ class SysconfigModule(Module):
         # Configure VNC serv properties
         if self.settings["vnc"]:
             self.runner.run(["raspi-config", "nonint", "do_vnc", "0"])
-            self.runner.run(["raspi-config", "nonint", "do_resolution", "1280x720"])
+            # self.runner.run(["raspi-config", "nonint", "do_resolution", "1280x720"])
 
     def configure(self) -> None:
         new_hostname = self.settings["hostname"]
