@@ -1,21 +1,19 @@
-# Example configuration for the Pi Home Automation Appliance Provisioning
-# Framework. Copy this file, adjust the values, and run:
+# Example configuration for House-Mate provisioning
+# Create a copy of this file and make changes before running
 #
-#   sudo ./setup.py my-config.yaml
+#   sudo ./setup.py path-to-config.yaml
 #
-# Homebridge and WireGuard are mandatory and always installed. This first
-# iteration of the framework does not yet implement mqtt / pai /
-# sprinklerd / aqualinkd -- they're left commented out below as a preview
-# of where they'll plug in once added.
+# Homebridge and WireGuard are mandatory and always installed,
+# as is basic system configuration.
 
 system:
-  hostname: PI_FOUR
+  hostname: raspberrypi
   vnc: true
 
 homebridge:
-  bridge_name: Pool Hub
+  bridge_name: House-Mate
   port: 8581
-  pin: "031-45-154"
+  pin: "123-45-678"
 
   plugins:
     homebridge-shelly:

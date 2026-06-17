@@ -27,16 +27,6 @@ CONFIG_PATH = "/var/lib/homebridge/config.json"
 SERVICE_NAME = "homebridge"
 
 
-def _generate_username() -> str:
-    """Generate a MAC-address-shaped 'username' for the homebridge bridge.
-
-    The high bit pattern (02) marks it as a locally-administered address,
-    matching the convention homebridge itself uses when it self-generates one.
-    """
-    octets = [0x02] + [secrets.randbits(8) for _ in range(5)]
-    return ":".join(f"{o:02X}" for o in octets)
-
-
 class HomebridgeModule(Module):
     name = "homebridge"
     required = True
@@ -53,19 +43,14 @@ class HomebridgeModule(Module):
     # -- install ----------------------------------------------------------
     def install(self) -> None:
         if self.runner.package_installed("homebridge"):
-            self.logger.info("homebridge package already installed, skipping install")
+            self.logger.info("Homebridge already installed... Skipping.")
             return
 
         self._add_apt_repo()
-        self.runner.run(["apt-get", "update"])
-        self.runner.run(["apt-get", "install", "-y", "homebridge"])
+        self.runner.run(["apt", "update"])
+        self.runner.run(["apt", "install", "-y", "homebridge"])
 
     def _add_apt_repo(self) -> None:
-        # Deliberately split into discrete commands (download, then dearmor)
-        # rather than `curl | gpg | tee` -- a shell pipeline's exit status
-        # reflects only its last stage, which would silently swallow a
-        # curl failure (e.g. network/DNS issues) and let install() barrel
-        # ahead as if the key had been fetched successfully.
         with tempfile.TemporaryDirectory() as tmp:
             tmp_key_path = str(Path(tmp) / "homebridge-key.gpg")
             self.runner.run(["curl", "-sSfL", REPO_KEY_URL, "-o", tmp_key_path])
@@ -73,24 +58,12 @@ class HomebridgeModule(Module):
         self.templates.write_text(REPO_LINE, REPO_SOURCES_LIST)
 
     # -- configure ---------------------------------------------------------
-    def _existing_username(self) -> str | None:
-        existing = self.templates.existing_file_text(CONFIG_PATH)
-        if not existing:
-            return None
-        try:
-            data = json.loads(existing)
-            return data.get("bridge", {}).get("username")
-        except (json.JSONDecodeError, AttributeError):
-            return None
-
     def configure(self) -> bool:
-        username = self._existing_username() or _generate_username()
         plugins = self.settings.get("plugins", {})
         context = {
             "bridge_name": self.settings["bridge_name"],
             "port": self.settings["port"],
-            "pin": self.settings["pin"],
-            "username": username,
+            "pin": self.settings["pin"]
         }
         changed = self.templates.render_to_file("homebridge/config.json.j2", context, CONFIG_PATH)
 
@@ -103,23 +76,19 @@ class HomebridgeModule(Module):
         return changed
 
     def _ensure_plugin(self, plugin_name: str) -> None:
-        check = self.runner.query(["npm", "list", "-g", plugin_name, "--depth=0"])
-        if check.ok:
-            self.logger.info("Plugin %s already installed, skipping", plugin_name)
-            return
         try:
-            self.runner.run(["npm", "install", "-g", plugin_name])
+            self.runner.run(["hb-service", "add", plugin_name])
         except CommandError as exc:
             raise ModuleError(f"Failed to install plugin '{plugin_name}': {exc}") from exc
 
     # -- enable -------------------------------------------------------------
     def enable(self) -> None:
         config_changed = getattr(self, "_last_configure_changed", False)
-        self.runner.run(["systemctl", "enable", SERVICE_NAME], check=False)
+        self.runner.run(["hb-service", "start"], check=False)
         if config_changed:
-            self.runner.run(["systemctl", "restart", SERVICE_NAME], check=False)
+            self.runner.run(["hb-service", "restart"], check=False)
         else:
-            self.runner.run(["systemctl", "start", SERVICE_NAME], check=False)
+            self.runner.run(["hb-service", "start"], check=False)
 
     # -- status --------------------------------------------------------------
     def status(self) -> bool:

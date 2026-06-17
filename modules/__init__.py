@@ -19,12 +19,12 @@ from modules.wireguard import WireGuardModule
 
 MODULE_REGISTRY: dict[str, type] = {
     "system": SysconfigModule,
-    # "homebridge": HomebridgeModule,
-    # "wireguard": WireGuardModule,
+    "homebridge": HomebridgeModule,
+    "wireguard": WireGuardModule,
     # "mqtt": MqttModule,            # not yet implemented
     # "pai": PaiModule,               # not yet implemented
     # "sprinklerd": SprinklerDModule, # not yet implemented
     # "aqualinkd": AqualinkDModule,   # not yet implemented
 }
 
-NOT_YET_IMPLEMENTED = {"homebridge", "wireguard", "mqtt", "pai", "sprinklerd", "aqualinkd"} - set(MODULE_REGISTRY)
+NOT_YET_IMPLEMENTED = {"mqtt", "pai", "sprinklerd", "aqualinkd"} - set(MODULE_REGISTRY)
