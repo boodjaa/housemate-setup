@@ -7,7 +7,7 @@ from modules.base import Module, ModuleError
 
 
 class SysconfigModule(Module):
-    name = "system"
+    name = "base"
     required = True
 
     def validate(self) -> None:
