@@ -48,6 +48,7 @@ def setup_logger(log_path: str | None = None, verbose: bool = False) -> logging.
         file_handler.setFormatter(formatter)
         file_handler.setLevel(logging.DEBUG)
         logger.addHandler(file_handler)
+        logger.info("Install started.")
         logger.info("Logging initialized -> %s", file_handler.baseFilename)
     else:
         logger.addHandler(logging.NullHandler())
