@@ -94,7 +94,7 @@ def validate_config(config: dict[str, Any]) -> None:
 
     homebridge = config["homebridge"]
     _require_type(homebridge, dict, "homebridge", "homebridge")
-    _require(homebridge, "bridge_name", "homebridge")
+    _require(homebridge, "client_id", "homebridge")
     port = _require(homebridge, "port", "homebridge")
     _require_type(port, int, "port", "homebridge")
     if not (1 <= port <= 65535):
