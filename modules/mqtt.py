@@ -74,8 +74,8 @@ class MqttModule(Module):
 
     def enable(self) -> None:
         # Enable VNC Server
-        if self.settings["vnc"]:
-            self.runner.run(["systemctl", "enable", "wayvnc"])
+        if self.settings["enabled"]:
+            self.runner.run(["systemctl", "enable", "mosquitto"])
 
     def status(self) -> None:
         pass
