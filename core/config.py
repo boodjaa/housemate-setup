@@ -91,6 +91,11 @@ def validate_config(config: dict[str, Any]) -> None:
         raise ConfigError(
             "Missing required 'wireguard' section (wireguard is a mandatory module)"
         )
+    
+    base = config["base"]
+    _require_type(base, dict, "base", "base")
+    _require(base, "hostname", "base")
+    _require(base, "vnc", "base")
 
     homebridge = config["homebridge"]
     _require_type(homebridge, dict, "homebridge", "homebridge")

@@ -41,11 +41,10 @@ from modules.base import ModuleError
 SCRIPT_DIR = Path(__file__).resolve().parent
 TEMPLATES_DIR = SCRIPT_DIR / "templates"
 
-
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         prog="setup.py",
-        description="Raspberry Pi Home Automation Appliance Provisioning Framework",
+        description="Setup script for HM Homebridge provisioning.",
     )
     parser.add_argument("config", help="Path to the YAML configuration file")
     parser.add_argument(
@@ -104,6 +103,8 @@ def run_module(module, ui: StatusUI) -> tuple[bool, Exception | None]:
 def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
     console = Console()
+
+    console.print("[bold]====================\n= House-Mate Setup =\n====================[/bold]")
 
     try:
         config = load_config(args.config)
