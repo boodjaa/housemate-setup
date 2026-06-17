@@ -26,6 +26,14 @@ REPO_LINE = f"deb [signed-by={REPO_KEYRING}] https://repo.homebridge.io stable m
 CONFIG_PATH = "/var/lib/homebridge/config.json"
 SERVICE_NAME = "homebridge"
 
+def _generate_username() -> str:
+    """Generate a MAC-address-shaped 'username' for the homebridge bridge.
+
+    The high bit pattern (02) marks it as a locally-administered address,
+    matching the convention homebridge itself uses when it self-generates one.
+    """
+    octets = [0x02] + [secrets.randbits(8) for _ in range(5)]
+    return ":".join(f"{o:02X}" for o in octets)
 
 class HomebridgeModule(Module):
     name = "homebridge"
@@ -64,7 +72,7 @@ class HomebridgeModule(Module):
             "bridge_name": "Homebridge " + self.settings["client_id"],
             "port": self.settings["port"],
             "pin": self.settings["pin"],
-            "username": self.settings["client_id"]
+            "username": _generate_username()
         }
         changed = self.templates.render_to_file("homebridge/config.json.j2", context, CONFIG_PATH)
 

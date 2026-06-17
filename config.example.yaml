@@ -6,7 +6,7 @@
 # Homebridge and WireGuard are mandatory and always installed,
 # as is basic system configuration.
 
-system:
+base:
   hostname: raspberrypi
   vnc: true
 

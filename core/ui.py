@@ -23,7 +23,7 @@ from __future__ import annotations
 import time
 from enum import Enum, auto
 
-from rich.console import Console
+from rich.console import Console, ConsoleOptions, RenderResult
 from rich.live import Live
 from rich.text import Text
 from rich.tree import Tree
@@ -40,6 +40,20 @@ class PhaseState(Enum):
     SKIPPED = auto()
 
 
+class _DynamicTree:
+    """
+    A wrapper that forces Rich's Live display to re-evaluate the tree 
+    on every refresh tick, rather than rendering a static snapshot.
+    """
+    def __init__(self, ui: "StatusUI"):
+        self.ui = ui
+
+    def __rich_console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
+        # Yielding the result of _render() ensures the spinner frame 
+        # (which depends on time.time()) is recalculated on every tick.
+        yield self.ui._render()
+
+
 class StatusUI:
     def __init__(self, module_names: list[str], console: Console | None = None):
         self.console = console or Console()
@@ -53,12 +67,22 @@ class StatusUI:
 
     # -- lifecycle -----------------------------------------------------
     def live(self) -> Live:
-        self._live = Live(self._render(), console=self.console, refresh_per_second=10, transient=False)
+        # We pass the _DynamicTree wrapper instead of a static Tree.
+        self._live = Live(
+            _DynamicTree(self), 
+            console=self.console, 
+            refresh_per_second=10, 
+            transient=False
+        )
         return self._live
 
     def _refresh(self) -> None:
-        if self._live is not None:
-            self._live.update(self._render())
+        # We NO LONGER manually call self._live.update(). 
+        # Doing so while the auto-refresh thread is running causes race 
+        # conditions, leading to cursor tracking failures and flickering.
+        # The auto-refresh thread will automatically pick up state changes 
+        # via the _DynamicTree wrapper within ~100ms.
+        pass
 
     # -- state transitions ----------------------------------------------
     def start_module(self, name: str) -> None:

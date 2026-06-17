@@ -18,7 +18,7 @@ from modules.homebridge import HomebridgeModule
 from modules.wireguard import WireGuardModule
 
 MODULE_REGISTRY: dict[str, type] = {
-    "system": SysconfigModule,
+    "base": SysconfigModule,
     "homebridge": HomebridgeModule,
     "wireguard": WireGuardModule,
     # "mqtt": MqttModule,            # not yet implemented
