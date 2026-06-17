@@ -72,6 +72,7 @@ class HomebridgeModule(Module):
             "bridge_name": "Homebridge " + self.settings["client_id"],
             "port": self.settings["port"],
             "pin": self.settings["pin"],
+            "ui_port": self.settings["ui_port"],
             "username": _generate_username()
         }
         changed = self.templates.render_to_file("homebridge/config.json.j2", context, CONFIG_PATH)
