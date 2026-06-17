@@ -7,7 +7,7 @@ from modules.base import Module, ModuleError
 
 class SysconfigModule(Module):
     name = "system"
-    required = False
+    required = True
 
     # -- install -----------------------------------------------------------
     def install(self) -> None:
