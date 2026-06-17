@@ -13,7 +13,7 @@ from __future__ import annotations
 import logging
 
 # Modules that always run, in execution order.
-REQUIRED_MODULES: list[str] = ["sysconfig", "homebridge", "wireguard"]
+REQUIRED_MODULES: list[str] = ["system", "homebridge", "wireguard"]
 
 # Modules a user can opt into via `<name>: {enabled: true}` in the YAML.
 OPTIONAL_MODULES: list[str] = ["mqtt", "pai", "sprinklerd", "aqualinkd"]
