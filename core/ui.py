@@ -1,25 +1,10 @@
 """
 Console status display (spec "Niceties" section).
-
-Renders a live-updating tree of modules and their phases:
-
-    Installation Status:
-    ✓ Homebridge
-      ✓ Install
-      ✓ Configure
-      ✓ Enable
-    ⠹ WireGuard
-      ✓ Install
-      ⠹ Configure
-      ∟ Enable
-
-Command output is intentionally never shown here -- only a phase's pass/fail
-status. Full stdout/stderr for a failure is printed separately, once, after
-the live tree is torn down, by the orchestrator.
 """
 
 from __future__ import annotations
 
+import contextlib
 import time
 from enum import Enum, auto
 
@@ -49,8 +34,6 @@ class _DynamicTree:
         self.ui = ui
 
     def __rich_console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
-        # Yielding the result of _render() ensures the spinner frame 
-        # (which depends on time.time()) is recalculated on every tick.
         yield self.ui._render()
 
 
@@ -67,7 +50,6 @@ class StatusUI:
 
     # -- lifecycle -----------------------------------------------------
     def live(self) -> Live:
-        # We pass the _DynamicTree wrapper instead of a static Tree.
         self._live = Live(
             _DynamicTree(self), 
             console=self.console, 
@@ -76,12 +58,19 @@ class StatusUI:
         )
         return self._live
 
+    @contextlib.contextmanager
+    def suspend_live(self):
+        """
+        Temporarily pause the Live display to allow raw terminal output 
+        (like apt-get logs) to render without breaking the UI structure.
+        """
+        if self._live is not None:
+            with self._live.suspend():
+                yield
+        else:
+            yield
+
     def _refresh(self) -> None:
-        # We NO LONGER manually call self._live.update(). 
-        # Doing so while the auto-refresh thread is running causes race 
-        # conditions, leading to cursor tracking failures and flickering.
-        # The auto-refresh thread will automatically pick up state changes 
-        # via the _DynamicTree wrapper within ~100ms.
         pass
 
     # -- state transitions ----------------------------------------------

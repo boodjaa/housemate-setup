@@ -1,28 +1,22 @@
 """
 Shell command execution.
-
-Every external command (apt-get, dpkg, npm, wg, systemctl, ...) goes through
-this one chokepoint so we get consistent logging, consistent dry-run
-behavior, and the "only show output on error" UI rule from the spec in one
-place instead of scattered across every module.
 """
 
 from __future__ import annotations
+
+import contextlib
 
 import logging
 import shlex
 import subprocess
 from dataclasses import dataclass, field
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from ui import StatusUI  # Avoid circular imports at runtime
 
 
 class CommandError(Exception):
-    """Raised when a command fails and the caller asked us to check=True.
-
-    Carries the captured stdout/stderr so the caller can decide how (or
-    whether) to surface it -- per spec, full command output should only be
-    shown to the user when something has gone wrong.
-    """
-
     def __init__(self, cmd: str, returncode: int, stdout: str, stderr: str):
         self.cmd = cmd
         self.returncode = returncode
@@ -62,13 +56,11 @@ class CommandRunner:
         input: str | None = None,
         env: dict | None = None,
         timeout: int | None = None,
+        ui: "StatusUI | None" = None,  # Added UI parameter
     ) -> Result:
-        """Run a command (list of args, or a string if shell=True).
-
-        In dry-run mode the command is logged but never actually executed,
-        and a synthetic successful Result is returned so module logic can
-        proceed through its normal control flow during a dry run.
-        """
+        """Run a command. If 'ui' is provided, the live display will be 
+        suspended during execution to prevent formatting corruption."""
+        
         printable = self._format(cmd)
 
         if self.dry_run:
@@ -78,16 +70,21 @@ class CommandRunner:
             return result
 
         self.logger.debug("Running: %s", printable)
+        
+        # Use the suspend context manager if UI is available
+        context = ui.suspend_live() if ui else contextlib.nullcontext()
+        
         try:
-            completed = subprocess.run(
-                cmd,
-                shell=shell,
-                input=input,
-                env=env,
-                timeout=timeout,
-                capture_output=True,
-                text=True,
-            )
+            with context:
+                completed = subprocess.run(
+                    cmd,
+                    shell=shell,
+                    input=input,
+                    env=env,
+                    timeout=timeout,
+                    capture_output=True,
+                    text=True,
+                )
         except FileNotFoundError as exc:
             result = Result(cmd=printable, returncode=127, stderr=str(exc))
             self.history.append(result)
@@ -122,14 +119,6 @@ class CommandRunner:
         return result
 
     def query(self, cmd, timeout: int | None = None, input: str | None = None) -> Result:
-        """Run a read-only status/inspection command for real, even during
-        --dry-run (e.g. dpkg-query, systemctl is-active, npm list, wg pubkey).
-
-        --dry-run means "don't make changes", not "don't look at the
-        system" -- a status check that always reported success regardless
-        of reality would make the preview lie about what's already done.
-        Never raises CommandError: callers inspect Result.ok themselves.
-        """
         printable = self._format(cmd)
         try:
             completed = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout, input=input)
@@ -147,12 +136,6 @@ class CommandRunner:
         return result
 
     def package_installed(self, package: str) -> bool:
-        """Check dpkg's database for whether a .deb package is installed.
-
-        This is a read-only query, so it runs for real even in dry-run mode
-        -- otherwise dry-run could never tell you what's already on the
-        system, which defeats the point of a preview.
-        """
         result = self.query(["dpkg-query", "-W", "-f=${Status}", package])
         return result.ok and "install ok installed" in result.stdout
 
