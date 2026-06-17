@@ -16,15 +16,16 @@ from __future__ import annotations
 from modules.sysconfig import SysconfigModule
 from modules.homebridge import HomebridgeModule
 from modules.wireguard import WireGuardModule
+from modules.mqtt import MqttModule
 
 MODULE_REGISTRY: dict[str, type] = {
     "base": SysconfigModule,
     "homebridge": HomebridgeModule,
     "wireguard": WireGuardModule,
-    # "mqtt": MqttModule,            # not yet implemented
+    "mqtt": MqttModule,
     # "pai": PaiModule,               # not yet implemented
     # "sprinklerd": SprinklerDModule, # not yet implemented
     # "aqualinkd": AqualinkDModule,   # not yet implemented
 }
 
-NOT_YET_IMPLEMENTED = {"mqtt", "pai", "sprinklerd", "aqualinkd"} - set(MODULE_REGISTRY)
+NOT_YET_IMPLEMENTED = {"pai", "sprinklerd", "aqualinkd"} - set(MODULE_REGISTRY)
