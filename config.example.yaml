@@ -19,7 +19,25 @@ homebridge:
   plugins:
     homebridge-shelly:
       enabled: true
-    homebridge-camera-ui:
+    homebridge-denon-tv:
+      enabled: true
+    homebridge-broadlink-rm-pro:
+      enabled: true
+    homebridge-mqttthing:
+      enabled: true
+    homebridge-camera-ffmpeg:
+      enabled: true
+    homebridge-daikin-local:
+      enabled: true
+    homebridge-google-nest-sdm:
+      enabled: true
+    homebridge-network-presence:
+      enabled: true
+    homebridge-samsung-tizen:
+      enabled: true
+    homebridge-sprinklerd:
+      enabled: true
+    homebridge-tahoma:
       enabled: true
 
 wireguard:

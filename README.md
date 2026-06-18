@@ -13,6 +13,26 @@ cp config.example.yaml config.yaml
 sudo ./setup.py config.yaml
 ```
 
+## Features
+Installs:
+- Homebridge ✓
+- WireGuard ✓
+- Mosquitto ✓
+- Python 3.11.15 ✓ (from source, takes ages)
+- PAI ✓
+- SprinklerD ✗
+- AqualinkD ✗
+
+Configures:
+- Hostname ✓
+- VNC Server ✓
+- Homebridge ✓
+- WireGuard ✓
+- Mosquitto ✓
+- PAI ✓
+- SprinklerD ✗
+- AqualinkD ✗
+
 ## Dry-run mode
 
 Mainly for testing
