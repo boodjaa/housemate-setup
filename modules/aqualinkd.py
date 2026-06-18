@@ -34,8 +34,18 @@ class AqualinkDModule(Module):
             self.logger.info("AqualinkD already installed at %s... Skipping.", BIN_PATH)
             return
 
+        install_script = "/tmp/aqualinkd_install.sh"
+        self.logger.info("Downloading AqualinkD install script...")
+        
+        # Download to a file first to avoid shell=True and pipefail issues
+        self.runner.run(["curl", "-fsSL", "https://install.aqualinkd.com", "-o", install_script])
+
         self.logger.info("Running install script for AqualinkD...")
-        self.runner.run(["curl", "-fsSL", "https://install.aqualinkd.com", "|", "bash", "-s", "--", "latest"])
+        try:
+            self.runner.run(["bash", install_script, "-s", "--", "latest"])
+        finally:
+            # Clean up the temporary script regardless of success or failure
+            Path(install_script).unlink(missing_ok=True)
 
     # -- configure --------------------------------------------------------
     def configure(self) -> bool:
@@ -53,9 +63,10 @@ class AqualinkDModule(Module):
             # in quotes for the PAI config file.
             return f"'{str(val)}'"
 
+        # FIX: Actually apply the _fmt() helper to the values!
         context = {
-            "panel_type": self.settings["panel_type"],
-            "mqtt_address": self.settings["mqtt_address"]
+            "panel_type": _fmt(self.settings["panel_type"]),
+            "mqtt_address": _fmt(self.settings["mqtt_address"])
         }
         
         conf_changed = self.templates.render_to_file("aqualinkd/aqualinkd.conf.j2", context, CONFIG_PATH)
