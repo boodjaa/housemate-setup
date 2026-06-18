@@ -92,7 +92,7 @@ class CommandRunner:
             self.history.append(result)
             return result
 
-        self.logger.debug("Running: %s%s", printable, f" (cwd={cwd})" if cwd else "")
+        self.logger.info("Running: %s%s", printable, f" (cwd={cwd})" if cwd else "")
         
         # Suspend the Rich Live UI while the command runs to prevent 
         # terminal output from corrupting the display structure.
@@ -119,7 +119,7 @@ class CommandRunner:
                 # Thread to read stderr live without deadlocking
                 def read_stderr():
                     for line in proc.stderr:
-                        self.logger.debug(line.rstrip('\r\n'))
+                        self.logger.info(line.rstrip('\r\n'))
                         stderr_lines.append(line)
                         
                 stderr_thread = threading.Thread(target=read_stderr)
@@ -156,7 +156,7 @@ class CommandRunner:
                         )
                         
                     # Log the line. If verbose mode is on, this prints to the console live!
-                    self.logger.debug(line.rstrip('\r\n'))
+                    self.logger.info(line.rstrip('\r\n'))
                     stdout_lines.append(line)
                     
                 stderr_thread.join()
@@ -194,7 +194,7 @@ class CommandRunner:
         self.history.append(result)
 
         if result.ok:
-            self.logger.debug("OK: %s", printable)
+            self.logger.info("OK: %s", printable)
             # Output was already streamed live, no need to log it again
         else:
             self.logger.error("Command failed (%s): %s", result.returncode, printable)
