@@ -25,6 +25,7 @@ import socket
 from modules.base import Module, ModuleError
 
 CRON_PATH = "/etc/cron.d/house-mate-config"
+# FIX: Added {uid} placeholder so .format() actually injects the UID
 HEALTHCHECK_URL = "https://hc-ping.com/{uid}"
 
 _HOSTNAME_RE = re.compile(r"^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?$")
@@ -126,8 +127,9 @@ class SysconfigModule(Module):
             raise ModuleError(f"Failed to update {hosts_path}: {e}")
 
     def _configure_cron(self) -> bool:
-        healthcheck_uid = self.settings["healthcheck"]
+        healthcheck_uid = self.settings.get("healthcheck")
         context = {
+            # Now correctly formats the UID into the URL, or passes None if not set
             "healthcheck": HEALTHCHECK_URL.format(uid=healthcheck_uid) if healthcheck_uid else None,
         }
         return self.templates.render_to_file("cron/cron-jobs.j2", context, CRON_PATH, mode=0o644)
