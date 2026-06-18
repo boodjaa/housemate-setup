@@ -1,0 +1,339 @@
+# aqualinkd.conf
+#
+
+
+# The web address aqualinkd daemon listens to.  
+# If you change this from 80, remember to update aqualink.service.avahi
+# Unless you are familiar with how these work, leave it alone.
+listen_address=http://0.0.0.0:80
+
+# The serial port the daemon access to read the Aqualink RS8
+serial_port=/dev/ttyUSB0
+# Other common options are below
+#serial_port=/dev/ttyS2
+#serial_port=/dev/serial0
+
+# The log level. [DEBUG_DERIAL, DEBUG, INFO, NOTICE, WARNING, ERROR]
+# Pick the highest level, and all levels below will be sent to syslog.
+# your syslog settings may be set to only display messages above a certian level
+# in which case make sure you use the log_file settings to capture everything
+# you want when debugging
+# so, NOTICE also prints WARNING & ERROR
+#     DEBUG_SERIAL would print everything possible
+
+#log_level=DEBUG
+#log_level=INFO
+log_level=NOTICE
+#log_level=WARNING
+
+# The directory where the web files are stored
+web_directory=/var/www/aqualinkd/
+
+
+# Your RS panel size. ie 4, 6, 8, 12 or 16 relates to RS4, RS6, RS8, RS12 or RS16.
+# VERY important that you select 12 or 16, if you have either of those size panels.
+# Also don't think setting a 12 when you have a 8 will give you 4 more accessories to control, it won't the
+# panel information is needed as different panels use different bits within the RS protocol for status and key
+# presses.
+# rs485mon will get the panel type string if you don't know it, below are examples.
+# Must be in format `XX-N ????`  (XX=RS or PD, N=Circuits, ????=Combo or Only or Dual)
+panel_type = {{ panel_type }}
+#panel_type = RS-8 Combo
+#panel_type = PD-8 Combo
+#panel_type = RS-16 Combo
+#panel_type = RS-2/14 Dual
+#panel_type = RS-4 Combo
+#panel_type = RS-8 Only
+#
+# If rs485mon doesn't give you a type string in the format above, you can use the next options to set the specifics.
+# 
+# panel_type_size = (6, 8, 10, 12, 14 or 16)  (Number of supported accessories / buttons)
+# panel_type_combo = (yes or no)              (combo panels support BOTH pool & spa)
+# panel_type_dual = (yes or no)               (dual circuit panel)
+# panel_type_pda = (yes or no)                (PDA panel. only set this if you have to. Panel ONLY supports the PDA protocol)
+# panel_type_rs = (yes or no)                 (RS panel. Panel Supports all protocols)
+
+
+# The ID of the Aqualink terminal device. Devices probed by RS8 master are:
+# 08-0b, 10-13, 18-1b, 20-23, 28-2b, 30-33, 38-3b, 40-43
+# Working RS ID's are 0x0a 0x0b 0x09 0x08    <- 0x08 is usually taken
+# If your panel is a PDA only model, then PDA device ID's are 0x60, 0x61, 0x62, 0x63.
+# (These are NOT recomended to use unless you absolutly have no other option)
+# Use 0xFF to let Aqualink auto configure all the ID's device_id, rssa_device_id, extended_device_id
+device_id=0xFF
+
+
+# The ID of Jandy SerialInterface device. These is only one usable ID, if rs485mon
+# picks up your panel supports this, uncomment, as it will speed up heater setpoints & RS16 panels.
+#rssa_device_id=0x48
+
+# The ID for extended settings to allow for faster programming
+# VARIABLE SPEED PUMP are only supported with this option.
+# Do not enable this if you don't use either, you'll just waste memory and cpu cycles
+# Valid ID's are 0x40, 0x41, 0x42 & 0x43. for ONE Touch
+# Valid ID's are 0x30, 0x31, 0x32 & 0x33. for Aqualink Touch
+#extended_device_id=0x31
+
+# If using 0x30 to 0x33 for extended_device_id, then enable below if you want to use virtual buttons
+#enable_iaqualink=yes
+
+
+# MQTT options
+mqtt_address=mqtt://{{ mqtt_address }}:1883
+#mqtt_user=<USER>
+#mqtt_passwd<PASWORD>
+#mqtt_aq_topic=aqualinkd
+#mqtt_discovery_topic=discovery
+#mqtt_discovery_use_mac=YES
+#mqtt_timed_update=YES
+#mqtt_convert_temp_to_c=YES
+
+# Read information from these devices directly from the RS485 bus as well as control panel. This will 
+# give you quicker updates and more information.
+# swg = Salt Water Generator
+# ePump = Jandy ePump or ePump AC
+# vsfPump = Pentair VS,VF,VSF pump
+# JXi = Jandy JXi heater (might also be LXi heaters)
+# LX = Jandy LX & LT heaters
+# Chem = Jandy Chemical Feeder
+# iAqualink = Read iAqualink2 (wifi device). Only relevant in PDA mode IF you have iAqualink2/3 device
+# HeatPump = Heatpumps.
+#read_RS485_swg = yes
+#read_RS485_ePump = yes 
+#read_RS485_vsfPump = yes
+#read_RS485_JXi = yes
+#read_RS485_LX = yes
+#read_RS485_ChemLink = yes
+#read_RS485_TruSense = yes
+#read_RS485_iAqualink = yes
+#read_RS485_HeatPump = yes
+
+
+# AqualinkD will start with no extra devices by default, and once it notices the device it will add it.
+# This is not so good for automation hubs (Homekit / HomeAssistant etc), these options will force AqualinkD
+# to start with these devides.
+#force_swg = yes
+#force_ps_setpoints = yes
+#force_frzprotect_setpoints = yes
+#force_chem_feeder = yes
+#force_chiller = yes
+
+
+# Enable AqualinkD scheduler.
+# A version of cron that supports cron.d must be installed for the scheduler to work.
+# If you used the install script and didn;t receive any cron warnings, you should be good to go.
+enable_scheduler = yes
+
+# Check if button_01 (usually Pump) is scheduled to run after an event that may have turned it off, and set it to run.
+# Only for RS panels, Will not work for PDA panles.
+# Example below is if pump is off due to power reset, freezeprotect or swg boots is turned off between 6am and 11pm then turn the pump on.
+# You can leave scheduler_check_pumpon_hour & scheduler_check_pumpoff_hour commented out and AqualinkD will try to find the hours from the actual schedule
+# that's been set in scheduler.  This only works if you have the same schedule for every day of the week. 
+#event_check_use_scheduler_times = NO
+#event_poweron_check_pump = YES
+#event_freezeprotectoff_check_pump = YES
+#event_boostoff_check_pump = YES
+#event_check_pumpon_hour = 6
+#event_check_pumpoff_hour = 24
+
+# This last one will link a button to SWG boost mode. When in boost mode, you usually have a problem that warrants running the pump faster.
+# So you can assign a virtual/one touch button to a particular pump RMP, and then turn it on with this option. (it will also turn it off when boost is finished)
+#event_booston_check_device = Fast Pump
+
+# Set the RS485 adapter into low latency mode (of supported)
+ftdi_low_latency=YES
+
+# Will change how RS485 / Serial works, Only use if asked to for problem solving purposes.
+# Delay between RS485 frame (set or packets that make up a command), reply too quickly can
+# cause slow panels (like PDA only) issues, reply too slowly and the control panel will think we are
+# dead.  
+# ~40 and we will be replying too slowley, so keep below that.
+# 10~20 is about what most device reply in. But 0-4 works well.
+# Recomended to set to at least 4 for PDA panels.
+#rs485_frame_delay=10
+
+# Keep the panel time synced with systemtime.  Make sure to set systemtime / NTP correctly. 
+sync_panel_time = yes
+
+# Display any warnings in web UI
+display_warnings_in_web = yes
+
+# If equiptment is in freeze protect mode some commands like pump_off / spa_on are
+# ignored.  You can force these to work by setting the below.
+#override_freeze_protect = yes
+
+# default is to use pool water temp as spa water temp when spa is off (and therefore not able to report water temp)
+# enable below to report 0 as the spa temp when spa is off.
+# This is for MQTT connections only, WEB socket and WEB API always report TEMP_UNKNOWN (-999) allowing the consumer to
+# decide how to report.
+report_zero_spa_temp = yes
+# When pool or spa is off, report 0deg for water temp. If set to no, last known value will be used.
+report_zero_pool_temp = yes
+
+# Put AqualinkD to sleep when in PDA mode after inactivity. 
+# Ignore if you are not using PDA mode.
+# If you have Jandy PDA then this MUST be set to yes as the controller can only support one PDA.
+# If you don't have a Jandy PDA leave this at no as AqualinkD will be a lot quicker.
+#pda_sleep_mode = yes
+
+
+# Lights can be programmed by control panel or AqualinkD (if controlpanel doesn't support specific light or light mode you want)
+# IF YOU WANT AQUALINKD TO PROGRAM THE LIGHT, IT MUST NOT BE CONFIGURED AS A COLOR LIGHT IN THE JANDY CONTROL PANEL.
+# Light probramming mode. 0=safe mode, but slow. 
+# any number greater is seconds to wait between button presses.  
+# 0.4 seems to be the minimum. (workd for light modes below 10 presses)
+# 0.6 seems to work about 95% of the time, but above 20 presses can be hit or miss.
+# 0 will simply wait for the controler to send the response back before sending the next, so is equivelent to about 1.2
+#light_programming_mode=0
+
+# Light programming assumes light needs to be on before sending pulse (above setting)
+# If the light is off when request is made to change "light show", then the below value are used
+#light_programming_initial_on=15
+
+# Turn the light off for below time before start programmig puleses.
+#light_programming_initial_off=12
+
+# If AqualinkD is programming the lights (and not control panel), set the light names / modes below/.
+#light_program_01=Voodoo Lounge - show
+#light_program_02=Blue Sea
+#light_program_03=Royal Blue
+#light_program_04=Afternoon Skies
+#light_program_05=Aqua Green
+#light_program_06=Emerald
+#light_program_07=Cloud White
+#light_program_08=Warm Red
+#light_program_09=Flamingo
+#light_program_10=Vivid Violet
+#light_program_11=Sangria
+#light_program_12=Twilight - show
+#light_program_13=Tranquility - show
+#light_program_14=Gemstone - show
+#light_program_15=USA - show
+#light_program_16=Mardi Gras - show
+#light_program_17=Cool Cabaret - show
+
+
+
+
+# These are all the button labels / options / pump and light configurations you want to use.
+# Simply change these to your setup, valid options for wach button are :-
+# None of these are mandatory unless you have PDA or RS16 panel, then _label is mandatory
+# button_??_label=Filter Pump    <Label you want to see>
+# button_??_dzidx=37             <Domoticz IDX>
+# button_??_pumpID=0x60          <RS485 ID of VSP>
+# button_??_pumpIndex=1          <Pump index Jandy panel is configured to use>
+# button_??_pumpType=Pentair VF  <Pump Type, one of the folowing :- JANDY ePUMP, Pentair VF, Pentair VS>
+# button_??_pumpName=My Pump     <Panel Rev Y supports renaming VSP, use the name here>
+# button_??_lightMode=4          <Color light mode>
+#
+# In most cases the label is just what you want to see in web UI/MQTT/API. ie you don't need to use Jandy's labeling. There are 2 exaeptions to the labeling listed below
+# 1) If using PDA mode, The Labels below are of the utmost importance, the labels MUST exactly match the labels in the "EQUIPTMENT ON/OFF" menu of the PDA device.
+# 2) RS 16 Panels have no protocol bit representation for AUXB5 to AUXB8, only text, so as with PDA Those labels MUST match the control panel.
+# Use NONE for label if you don't have anything connected to that circuit and don't want to see the button in the UI.
+#
+# Below is an example of how different Panels map into the buttons.
+#
+#             |  RS-4 Combo  |  RS-6 Combo  |  RS-6 Only   | RS-8 Combo   | RS-2/6 Dual  | RS-2/10 Dual |  RS-16 Combo |
+#             ----------------------------------------------------------------------------------------------------------
+# Button_01   | Filter Pump  | Filter Pump  | Filter Pump  | Filter Pump  | Filter Pump  | Filter Pump  | Filter Pump  |
+# Button_02   | Spa          | Spa          | Aux_1        | Spa          | Spa          | Spa          | Spa          |
+# Button_03   | Aux 1        | Aux 1        | Aux 2        | Aux 1        | Aux 1        | Aux 1        | Aux 1        |
+# Button_04   | Aux 2        | Aux 2        | Aux 3        | Aux 2        | Aux 2        | Aux 2        | Aux 2        |
+# Button_05   | Aux 3        | Aux 3        | Aux 4        | Aux 3        | Aux 3        | Aux 3        | Aux 3        |
+# Button_06   | Pool Heater  | Aux 4        | Aux 5        | Aux 4        | Aux 4        | Aux 4        | Aux 4        |
+# Button_07   | Spa Heater   | Aux 5        | Temp 1       | Aux 5        | Aux 5        | Aux 5        | Aux 5        |
+# Button_08   | Solar Heater | Pool Heater  | Temp 2       | Aux 6        | Aux 6        | Aux 6        | Aux 6        |
+# Button_09   |              | Spa Heater   | Solar Heater | Aux 7        | Pool Heater  | Aux B1       | Aux 7        |
+# Button_10   |              | Solar Heater |              | Pool Heater  | Spa Heater   | Aux B2       | Aux B1       |
+# Button_11   |              |              |              | Spa Heater   | Solar Heater | Aux B3       | Aux B2       |
+# Button_12   |              |              |              | Solar Heater |              | Aux B4       | Aux B3       |
+# Button_13   |              |              |              |              |              | Pool Heater  | Aux B4       |
+# Button_14   |              |              |              |              |              | Spa Heater   | Aux B5       |
+# Button_15   |              |              |              |              |              | Solar Heater | Aux B6       |
+# Button_16   |              |              |              |              |              |              | Aux B7       |
+# Button_17   |              |              |              |              |              |              | Aux B8       |
+# Button_18   |              |              |              |              |              |              | Pool Heater  |
+# Button_19   |              |              |              |              |              |              | Spa Heater   |
+# Button_20   |              |              |              |              |              |              | Solar Heater |
+
+#
+# Optional, ( button_01_pumpID & button_01_pumpIndex )
+# If you have a Variable Speed Pump, then assign the RS485 ID to the button below so RPM/GPH/WATTS are displayed
+# Format is button_01_pumpID=0x60.   Leave blank if you don't have a VSP.
+#  Pentair pump ID's
+#  0x60 to 0x6F (0x60, 0x61 0x62, 0x64, 0x65, 0x66, 0x67, 0x68, 0x69, 0x6A, 0x6B, 0x6C, 0x6D, 0x6E, 0x6F)
+#  Jandy pump ID's
+#  0x78, 0x79, 0x7A, 0x7B
+#
+# button_01_pumpIndex=1
+# If you have assigned this pump an index number in your Aqualink control panel, (Between 1 & 4), put it here for VSP, RPM, Primp information to be captured.
+#
+# button_xx_lightMode = (0=Aqualink program, 1=Jandy, 2=Jandy LED, 3=SAm/SAL, 4=Color Logic, 5=Intellibrite, 6=Hayw Univ Color, 7,8,9(future), 10=Dimmer, 11=Full Range Dimmer)
+# 
+# Below are settings for standard buttons on RS-8 Combo panel used as example.
+#
+button_01_label={{ button_01_label }}
+#button_01_pumpIndex=1
+#button_01_pumpID=0x78
+#button_01_pumpName=Intelliflo VS 1
+#button_01_pumpType=Pentair VS
+
+button_02_label={{ button_02_label }}
+button_03_label={{ button_03_label }}
+button_04_label={{ button_04_label }}
+button_05_label={{ button_05_label }}
+
+button_06_label={{ button_06_label }}
+#button_06_lightMode=2
+
+button_07_label={{ button_07_label }}
+#button_07_lightMode=2
+
+button_08_label={{ button_08_label }}
+#button_09_label=NONE
+#button_10_label=Pool Heater
+#button_11_label=Spa Heater
+#button_12_label=Solar Heater
+
+# Virtual buttons.
+# To use these you must have extended_device_id set to AqualnkTouch protocol, ie 0x31, 0x31, 0x32, 0x33
+# These are the One Touch buttons. By default below are the labels
+# Panels rev Yg and newer support custom virtual buttons as well, simply add these here
+# Add the ones you would like to use below, making sure to
+#    a) Sequential order of the button number starting 01
+#    b) Label must be IDENTICAL to how it's displayed on a AqualinkTouch device (or web)
+#
+#virtual_button_01_label=Spa Mode
+#virtual_button_02_label=Clean Mode
+#virtual_button_03_label = OneTouch 4
+#virtual_button_04_label = OneTouch 5
+#virtual_button_05_label = OneTouch 6
+
+# Sensors.
+# All Raspberry Pi's (and most other SBC) report CPU temp. Most report to /sys/class/thermal/thermal_zone0/temp, 
+# you can monitor these and AqualinkD will post the information to MQTT.
+# These will depend a lot on the board & OS you are running.
+# the "factor" is the number the sensor is multiplied by to get an accurate result. example below is (millidegrees Celsius to Celsius)
+
+# Poll time in seconds
+#sensor_poll_time=5
+
+#sensor_01_path = /sys/class/thermal/thermal_zone0/temp
+#sensor_01_label = CPU
+#sensor_01_factor = 0.001
+#sensor_01_uom=°C
+
+# Boards like Radxa Zero3 have others sensors like below.
+#sensor_02_path = /sys/class/thermal/thermal_zone1/temp
+#sensor_02_label = GPU
+#sensor_02_factor = 0.001
+#sensor_02_uom=°C
+
+# Linux load average 
+#sensor_03_path = /proc/loadavg
+#sensor_03_label = CPU load
+#sensor_03_uom = %
+#sensor_03_regexp = ([0-9|\.]*)\s
+# Sesnor factor needs to be divide by #cores of CPU.  So 1 core = 100, 4 core CPU = 25. Pi Zero=1 core, Pi Zero2=4 core
+#sensor_03_factor = 100 
+#sensor_03_factor = 25

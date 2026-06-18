@@ -61,9 +61,7 @@ pai:
   mqtt_host: 127.0.0.1
   interface_password: paradox
 
-# --- not yet implemented in this iteration -----------------------------
-# sprinklerd:
-#   enabled: false
-#
-# aqualinkd:
-#   enabled: true
+aqualinkd:
+  enabled: true
+  panel_type: RS-8 Combo
+  mqtt_address: 127.0.0.1
