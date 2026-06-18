@@ -38,7 +38,7 @@ BUILD_DEPENDENCIES = [
     "build-essential", "gdb", "lcov", "pkg-config",
     "libbz2-dev", "libffi-dev", "libgdbm-dev", "libgdbm-compat-dev",
     "liblzma-dev", "libncurses5-dev", "libreadline-dev", "libsqlite3-dev",
-    "libssl-dev", "lzma", "lzma-dev", "tk-dev", "uuid-dev", "zlib1g-dev",
+    "libssl-dev", "lzma", "tk-dev", "uuid-dev", "zlib1g-dev",
 ]
 
 _VERSION_RE = re.compile(r"^(\d+)\.(\d+)\.(\d+)$")
