@@ -18,6 +18,7 @@ from modules.homebridge import HomebridgeModule
 from modules.wireguard import WireGuardModule
 from modules.mqtt import MqttModule
 from modules.python311 import Python311Module
+from modules.pai import PaiModule
 
 MODULE_REGISTRY: dict[str, type] = {
     "base": SysconfigModule,
@@ -25,9 +26,9 @@ MODULE_REGISTRY: dict[str, type] = {
     "wireguard": WireGuardModule,
     "mqtt": MqttModule,
     "python311": Python311Module,
-    # "pai": PaiModule,               # not yet implemented
+    "pai": PaiModule,
     # "sprinklerd": SprinklerDModule, # not yet implemented
     # "aqualinkd": AqualinkDModule,   # not yet implemented
 }
 
-NOT_YET_IMPLEMENTED = {"pai", "sprinklerd", "aqualinkd"} - set(MODULE_REGISTRY)
+NOT_YET_IMPLEMENTED = {"sprinklerd", "aqualinkd"} - set(MODULE_REGISTRY)
