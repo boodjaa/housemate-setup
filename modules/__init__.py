@@ -25,8 +25,8 @@ MODULE_REGISTRY: dict[str, type] = {
     "homebridge": HomebridgeModule,
     "wireguard": WireGuardModule,
     "mqtt": MqttModule,
-    "python311": Python311Module,
     "pai": PaiModule,
+    "python311": Python311Module,
     # "sprinklerd": SprinklerDModule, # not yet implemented
     # "aqualinkd": AqualinkDModule,   # not yet implemented
 }
