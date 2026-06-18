@@ -21,7 +21,7 @@ OPTIONAL_MODULES: list[str] = ["mqtt", "python311", "pai", "sprinklerd", "aquali
 # child -> [parents it depends on]. A child is only ever auto-enabled when
 # something that needs it is enabled; it is never enabled "just because".
 DEPENDENCIES: dict[str, list[str]] = {
-    "pai": ["mqtt"],
+    "pai": ["mqtt", "python311"],
     "sprinklerd": ["mqtt"],
     "aqualinkd": ["mqtt"],
 }

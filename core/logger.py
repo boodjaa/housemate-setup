@@ -2,7 +2,7 @@
 Logging setup.
 
 Per the spec, all activity (INFO/WARNING/ERROR) is recorded to
-/var/log/hub-setup.log. The live, human-facing status display is handled
+/var/log/housemate-setup.log. The live, human-facing status display is handled
 separately by core.ui.StatusUI -- this logger is the durable audit trail,
 not the thing the user watches scroll by.
 """
@@ -13,8 +13,8 @@ import logging
 from pathlib import Path
 
 
-DEFAULT_LOG_PATH = "/var/log/hub-setup.log"
-FALLBACK_LOG_PATH = "./logs/hub-setup.log"
+DEFAULT_LOG_PATH = "/var/log/housemate-setup.log"
+FALLBACK_LOG_PATH = "./logs/housemate-setup.log"
 
 
 def setup_logger(log_path: str | None = None, verbose: bool = False) -> logging.Logger:
@@ -22,7 +22,7 @@ def setup_logger(log_path: str | None = None, verbose: bool = False) -> logging.
 
     Always logs to a file. If the preferred location isn't writable (e.g.
     running without root, or during --dry-run on a non-Pi machine), falls
-    back to ./logs/hub-setup.log so the run is still recorded.
+    back to ./logs/housemate-setup.log so the run is still recorded.
     """
     logger = logging.getLogger("House-Mate Setup")
     logger.setLevel(logging.DEBUG)

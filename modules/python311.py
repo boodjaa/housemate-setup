@@ -94,7 +94,7 @@ class Python311Module(Module):
 
     def _install_build_dependencies(self) -> None:
         # Best-effort: needs deb-src enabled, which a stock image may not have.
-        self.runner.run_apt(["build-dep", "-y", "python3"], check=False)
+        # self.runner.run_apt(["build-dep", "-y", "python3"], check=False)
         self.runner.run_apt(["install", "-y", *BUILD_DEPENDENCIES])
 
     def _build_and_install(self, version: str) -> None:
