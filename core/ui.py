@@ -29,7 +29,7 @@ from rich.text import Text
 from rich.tree import Tree
 
 SPINNER_FRAMES = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"]
-PHASES = ("Prepare", "Install", "Configure", "Enable")
+PHASES = ("Validate", "Install", "Configure", "Enable")
 
 
 class PhaseState(Enum):
