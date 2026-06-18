@@ -180,6 +180,8 @@ def main(argv: list[str] | None = None) -> int:
             else:
                 console.print(f"  {exc}")
 
+    logger.info("Installation complete! Reboot recommended.")
+    
     console.print()
 
     console.print(f"[bold]Installation complete![/bold]")
