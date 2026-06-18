@@ -126,7 +126,7 @@ class SysconfigModule(Module):
             raise ModuleError(f"Failed to update {hosts_path}: {e}")
 
     def _configure_cron(self) -> bool:
-        healthcheck_uid = self.settings.get("healthcheck")
+        healthcheck_uid = self.settings["healthcheck"]
         context = {
             "healthcheck": HEALTHCHECK_URL.format(uid=healthcheck_uid) if healthcheck_uid else None,
         }
