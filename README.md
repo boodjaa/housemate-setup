@@ -41,7 +41,7 @@ Configures:
 | `[config]`           | Path to the YAML config file (positional, required)                                                  |
 | `--dry-run`        | Preview only; no root required, no system changes. Testing purposes                                  |
 | `--verbose` / `-v` | Also echo log lines to the console                                                                   |
-| `--log-file PATH`  | Override the log location (default `/var/log/hub-setup.log`, falling back to `./logs/hub-setup.log`) |
+| `--log-file PATH`  | Override the log location (default `/var/log/housemate-setup.log`, falling back to `./logs/housemate-setup.log`) |
 
 ## Adding with a new module
 
