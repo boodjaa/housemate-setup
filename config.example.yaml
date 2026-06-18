@@ -10,6 +10,7 @@ base:
   hostname: raspberrypi
   ssh: true
   vnc: true
+  healthcheck: healthcheck-url-uid-here
 
 homebridge:
   client_id: default

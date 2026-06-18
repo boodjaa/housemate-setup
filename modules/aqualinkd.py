@@ -65,8 +65,8 @@ class AqualinkDModule(Module):
 
         # FIX: Actually apply the _fmt() helper to the values!
         context = {
-            "panel_type": _fmt(self.settings["panel_type"]),
-            "mqtt_address": _fmt(self.settings["mqtt_address"])
+            "panel_type": self.settings["panel_type"],
+            "mqtt_address": self.settings["mqtt_address"]
         }
         
         conf_changed = self.templates.render_to_file("aqualinkd/aqualinkd.conf.j2", context, CONFIG_PATH)

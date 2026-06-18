@@ -4,8 +4,5 @@
 # Nightly reboot
 00 03 * * * root /sbin/reboot
 
-{% if healthcheck_url %}
-# Health check ping (healthchecks.io) -- -fsS: fail + stay silent on
-# success, but still surface a real curl error if one happens
-*/5 * * * * root curl -fsS {{ healthcheck_url }} >/dev/null 2>&1
-{% endif %}
+# Health Check
+*/5 * * * * root curl -fsS {{ healthcheck }} >/dev/null 2>&1

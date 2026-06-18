@@ -128,7 +128,7 @@ class SysconfigModule(Module):
     def _configure_cron(self) -> bool:
         healthcheck_uid = self.settings.get("healthcheck")
         context = {
-            "healthcheck_url": HEALTHCHECK_URL.format(uid=healthcheck_uid) if healthcheck_uid else None,
+            "healthcheck": HEALTHCHECK_URL.format(uid=healthcheck_uid) if healthcheck_uid else None,
         }
         return self.templates.render_to_file("cron/cron-jobs.j2", context, CRON_PATH, mode=0o644)
 
