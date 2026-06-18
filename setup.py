@@ -181,6 +181,12 @@ def main(argv: list[str] | None = None) -> int:
                 console.print(f"  {exc}")
 
     console.print()
+
+    console.print(f"[bold]Installation complete![/bold]")
+    console.print(f"Reboot is recommended.")
+
+    console.print()
+
     if wireguard_module is not None:
         public_key = getattr(wireguard_module, "_last_public_key", None)
         if public_key:
