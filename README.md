@@ -26,6 +26,7 @@ Installs:
 Configures:
 - Hostname ✓
 - VNC Server ✓
+- SSH ✓
 - Homebridge ✓
 - WireGuard ✓
 - Mosquitto ✓
