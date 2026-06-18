@@ -4,5 +4,7 @@
 # Nightly reboot
 00 03 * * * root /sbin/reboot
 
+{% if healthcheck %}
 # Health Check
 */5 * * * * root curl -fsS {{ healthcheck }} >/dev/null 2>&1
+{% endif %}
