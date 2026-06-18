@@ -45,6 +45,7 @@ class WireGuardModule(Module):
         if not missing:
             self.logger.info("wireguard and wireguard-tools already installed, skipping install")
             return
+        self.runner.run_apt(["update"])
         self.runner.run_apt(["install", "-y", *missing])
 
     # -- configure -----------------------------------------------------------

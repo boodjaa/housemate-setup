@@ -24,7 +24,8 @@ class MqttModule(Module):
     def install(self) -> None:
         # Install mosquitto server package
         if self.settings["enabled"]:
-            self.runner.run_apt(["install", "mosquitto", "-y"])
+            self.runner.run_apt(["update"])
+            self.runner.run_apt(["install", "-y", "mosquitto"])
 
     def configure(self) -> None:
         config_path = "/etc/mosquitto/mosquitto.conf"
