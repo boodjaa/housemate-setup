@@ -55,8 +55,8 @@ class HomebridgeModule(Module):
             return
 
         self._add_apt_repo()
-        self.runner.run_apt(["apt", "update"])
-        self.runner.run_apt(["apt", "install", "-y", "homebridge"])
+        self.runner.run_apt(["update"])
+        self.runner.run_apt(["install", "-y", "homebridge"])
 
     def _add_apt_repo(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
