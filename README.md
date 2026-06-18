@@ -20,19 +20,23 @@ Installs:
 - Mosquitto ✓
 - Python 3.11.15 ✓ (from source, takes ages)
 - PAI ✓
-- SprinklerD ✗
 - AqualinkD ✓
+- SprinklerD ✗
 
 Configures:
 - Hostname ✓
 - VNC Server ✓
 - SSH ✓
+- Cron job scheduling ✓
+  - Scheduled boot ✓
+  - Health check ping ✓
+- Systemd autostart units ✓
 - Homebridge ✓
 - WireGuard ✓
 - Mosquitto ✓
 - PAI ✓
-- SprinklerD ✗
 - AqualinkD ✓
+- SprinklerD ✗
 
 ## CLI flags
 
