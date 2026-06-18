@@ -80,7 +80,13 @@ class PaiModule(Module):
         def _fmt(val):
             if val is None:
                 return "None"
-            return f"'{val}'"
+            if isinstance(val, bool):
+                return "True" if val else "False"
+            
+            # Explicitly cast to string. This ensures that if a user forgets to 
+            # quote a numeric password like 1234 in YAML, it still gets wrapped 
+            # in quotes for the PAI config file.
+            return f"'{str(val)}'"
 
         context = {
             "endpoint": _fmt(self.settings.get("endpoint")),

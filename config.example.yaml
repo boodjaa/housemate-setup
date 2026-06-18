@@ -39,18 +39,13 @@ python311:
 pai:
   enabled: true
   endpoint: 192.168.1.50
-  pc_password: 0000
+  pc_password: "0000"
   mqtt_host: 127.0.0.1
   interface_password: paradox
 
 # --- not yet implemented in this iteration -----------------------------
-# pai:
-#   enabled: true
-#   ip150_endpoint: 192.168.1.50
-#
 # sprinklerd:
 #   enabled: false
 #
 # aqualinkd:
 #   enabled: true
-#
