@@ -19,6 +19,10 @@ class SysconfigModule(Module):
             self.runner.run(["raspi-config", "nonint", "do_vnc", "0"])
             # self.runner.run(["raspi-config", "nonint", "do_resolution", "1280x720"])
 
+        # Configure SSH server
+        if self.settings["ssh"]:
+            self.runner.run(["raspi-config", "nonint", "do_ssh", "0"])
+
     def configure(self) -> None:
         new_hostname = self.settings["hostname"]
         old_hostname = socket.gethostname()
@@ -80,6 +84,10 @@ class SysconfigModule(Module):
         # Enable VNC Server
         if self.settings["vnc"]:
             self.runner.run(["systemctl", "enable", "wayvnc"])
+
+        # Enable SSH Server
+        if self.settings["ssh"]:
+            self.runner.run(["systemctl", "enable", "ssh"])
 
     def status(self) -> None:
         pass

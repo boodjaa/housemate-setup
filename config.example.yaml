@@ -8,6 +8,7 @@
 
 base:
   hostname: raspberrypi
+  ssh: true
   vnc: true
 
 homebridge:
