@@ -45,7 +45,7 @@ class WireGuardModule(Module):
         if not missing:
             self.logger.info("wireguard and wireguard-tools already installed, skipping install")
             return
-        self.runner.run(["apt-get", "install", "-y", *missing])
+        self.runner.run_apt(["apt-get", "install", "-y", *missing])
 
     # -- configure -----------------------------------------------------------
     def _existing_private_key(self) -> str | None:

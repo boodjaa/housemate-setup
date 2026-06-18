@@ -10,6 +10,7 @@ place instead of scattered across every module.
 from __future__ import annotations
 
 import logging
+import os
 import shlex
 import subprocess
 from dataclasses import dataclass, field
@@ -120,6 +121,29 @@ class CommandRunner:
                 raise CommandError(printable, result.returncode, result.stdout, result.stderr)
 
         return result
+
+    def run_apt(self, args: list, check: bool = True) -> Result:
+        """Run an apt-get command in a way that won't fight a live console
+        display (e.g. core.ui.StatusUI) for control of the terminal.
+
+        Two apt/dpkg behaviours cause exactly that kind of corruption when
+        something else is also managing the terminal:
+
+        - By default, apt allocates its own pseudo-terminal for dpkg so
+          dpkg's fancy/colored progress bar renders correctly when apt's
+          output is going to a real terminal. That pty and our Live display
+          both then write cursor-movement sequences to the *same* physical
+          terminal, and neither knows about the other's writes -- `-o
+          Dpkg::Use-Pty=0` turns off apt's pty allocation so dpkg just
+          writes plain line-based output instead.
+        - debconf can still attempt an interactive prompt for some packages
+          even with `-y`; DEBIAN_FRONTEND=noninteractive heads that off so
+          nothing tries to pop a dialog onto the same terminal mid-install.
+        """
+        env = os.environ.copy()
+        env["DEBIAN_FRONTEND"] = "noninteractive"
+        full_cmd = ["apt-get", "-o", "Dpkg::Use-Pty=0", *args]
+        return self.run(full_cmd, check=check, env=env)
 
     def query(self, cmd, timeout: int | None = None, input: str | None = None) -> Result:
         """Run a read-only status/inspection command for real, even during
