@@ -25,7 +25,7 @@ import socket
 from modules.base import Module, ModuleError
 
 CRON_PATH = "/etc/cron.d/house-mate-config"
-HEALTHCHECK_URL = "https://hc-ping.com/uid"
+HEALTHCHECK_URL = "https://hc-ping.com/{uid}"
 
 _HOSTNAME_RE = re.compile(r"^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?$")
 
