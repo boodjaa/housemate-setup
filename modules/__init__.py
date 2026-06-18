@@ -17,12 +17,14 @@ from modules.sysconfig import SysconfigModule
 from modules.homebridge import HomebridgeModule
 from modules.wireguard import WireGuardModule
 from modules.mqtt import MqttModule
+from modules.python311 import Python311Module
 
 MODULE_REGISTRY: dict[str, type] = {
     "base": SysconfigModule,
     "homebridge": HomebridgeModule,
     "wireguard": WireGuardModule,
     "mqtt": MqttModule,
+    "python311": Python311Module,
     # "pai": PaiModule,               # not yet implemented
     # "sprinklerd": SprinklerDModule, # not yet implemented
     # "aqualinkd": AqualinkDModule,   # not yet implemented

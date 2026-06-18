@@ -9,11 +9,18 @@ place instead of scattered across every module.
 
 from __future__ import annotations
 
+import contextlib
 import logging
 import os
 import shlex
 import subprocess
+import threading
+import time
 from dataclasses import dataclass, field
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from ui import StatusUI  # Avoid circular imports at runtime
 
 
 class CommandError(Exception):
@@ -63,32 +70,100 @@ class CommandRunner:
         input: str | None = None,
         env: dict | None = None,
         timeout: int | None = None,
+        cwd: str | None = None,
+        ui: "StatusUI | None" = None,
     ) -> Result:
         """Run a command (list of args, or a string if shell=True).
 
         In dry-run mode the command is logged but never actually executed,
         and a synthetic successful Result is returned so module logic can
         proceed through its normal control flow during a dry run.
+        
+        Output is streamed line-by-line to the logger. If the logger has a 
+        console handler (verbose mode), this provides live terminal output.
         """
         printable = self._format(cmd)
 
         if self.dry_run:
-            self.logger.info("[DRY-RUN] Would run: %s", printable)
+            self.logger.info(
+                "[DRY-RUN] Would run: %s%s", printable, f" (cwd={cwd})" if cwd else ""
+            )
             result = Result(cmd=printable, returncode=0, dry_run=True)
             self.history.append(result)
             return result
 
-        self.logger.debug("Running: %s", printable)
+        self.logger.debug("Running: %s%s", printable, f" (cwd={cwd})" if cwd else "")
+        
+        # Suspend the Rich Live UI while the command runs to prevent 
+        # terminal output from corrupting the display structure.
+        context = ui.suspend_live() if ui else contextlib.nullcontext()
+        
         try:
-            completed = subprocess.run(
-                cmd,
-                shell=shell,
-                input=input,
-                env=env,
-                timeout=timeout,
-                capture_output=True,
-                text=True,
-            )
+            with context:
+                # Use Popen to stream output line-by-line
+                proc = subprocess.Popen(
+                    cmd,
+                    shell=shell,
+                    stdin=subprocess.PIPE if input else subprocess.DEVNULL,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    env=env,
+                    cwd=cwd,
+                    text=True,      # Decode bytes to str automatically
+                    bufsize=1,      # Line buffered
+                )
+                
+                stdout_lines = []
+                stderr_lines = []
+                
+                # Thread to read stderr live without deadlocking
+                def read_stderr():
+                    for line in proc.stderr:
+                        self.logger.debug(line.rstrip('\r\n'))
+                        stderr_lines.append(line)
+                        
+                stderr_thread = threading.Thread(target=read_stderr)
+                stderr_thread.start()
+                
+                # Thread to write stdin live without deadlocking
+                stdin_thread = None
+                if input:
+                    def write_stdin():
+                        try:
+                            proc.stdin.write(input)
+                        except BrokenPipeError:
+                            pass
+                        finally:
+                            proc.stdin.close()
+                            
+                    stdin_thread = threading.Thread(target=write_stdin)
+                    stdin_thread.start()
+                
+                start_time = time.time()
+                
+                # Stream stdout line-by-line
+                for line in proc.stdout:
+                    # Enforce timeout manually since we are blocking on readline()
+                    if timeout is not None and (time.time() - start_time) > timeout:
+                        proc.kill()
+                        stderr_thread.join()
+                        if stdin_thread:
+                            stdin_thread.join()
+                        raise subprocess.TimeoutExpired(
+                            cmd, timeout, 
+                            output="".join(stdout_lines), 
+                            stderr="".join(stderr_lines)
+                        )
+                        
+                    # Log the line. If verbose mode is on, this prints to the console live!
+                    self.logger.debug(line.rstrip('\r\n'))
+                    stdout_lines.append(line)
+                    
+                stderr_thread.join()
+                if stdin_thread:
+                    stdin_thread.join()
+                proc.wait()
+                
         except FileNotFoundError as exc:
             result = Result(cmd=printable, returncode=127, stderr=str(exc))
             self.history.append(result)
@@ -96,33 +171,39 @@ class CommandRunner:
                 raise CommandError(printable, 127, "", str(exc)) from exc
             return result
         except subprocess.TimeoutExpired as exc:
-            result = Result(cmd=printable, returncode=124, stderr=str(exc))
+            result = Result(
+                cmd=printable, 
+                returncode=124, 
+                stdout=exc.output or "", 
+                stderr=exc.stderr or ""
+            )
             self.history.append(result)
             if check:
-                raise CommandError(printable, 124, exc.stdout or "", exc.stderr or "") from exc
+                raise CommandError(printable, 124, result.stdout, result.stderr) from exc
             return result
+
+        stdout_str = "".join(stdout_lines)
+        stderr_str = "".join(stderr_lines)
 
         result = Result(
             cmd=printable,
-            returncode=completed.returncode,
-            stdout=completed.stdout or "",
-            stderr=completed.stderr or "",
+            returncode=proc.returncode,
+            stdout=stdout_str,
+            stderr=stderr_str,
         )
         self.history.append(result)
 
         if result.ok:
             self.logger.debug("OK: %s", printable)
+            # Output was already streamed live, no need to log it again
         else:
-            self.logger.error(
-                "Command failed (%s): %s\nstdout: %s\nstderr: %s",
-                result.returncode, printable, result.stdout, result.stderr,
-            )
+            self.logger.error("Command failed (%s): %s", result.returncode, printable)
             if check:
                 raise CommandError(printable, result.returncode, result.stdout, result.stderr)
 
         return result
 
-    def run_apt(self, args: list, check: bool = True) -> Result:
+    def run_apt(self, args: list, check: bool = True, ui: "StatusUI | None" = None) -> Result:
         """Run an apt-get command in a way that won't fight a live console
         display (e.g. core.ui.StatusUI) for control of the terminal.
 
@@ -143,7 +224,7 @@ class CommandRunner:
         env = os.environ.copy()
         env["DEBIAN_FRONTEND"] = "noninteractive"
         full_cmd = ["apt-get", "-o", "Dpkg::Use-Pty=0", *args]
-        return self.run(full_cmd, check=check, env=env)
+        return self.run(full_cmd, check=check, env=env, ui=ui)
 
     def query(self, cmd, timeout: int | None = None, input: str | None = None) -> Result:
         """Run a read-only status/inspection command for real, even during

@@ -16,12 +16,12 @@ import logging
 REQUIRED_MODULES: list[str] = ["base", "homebridge", "wireguard"]
 
 # Modules a user can opt into via `<name>: {enabled: true}` in the YAML.
-OPTIONAL_MODULES: list[str] = ["mqtt", "pai", "sprinklerd", "aqualinkd"]
+OPTIONAL_MODULES: list[str] = ["mqtt", "python311", "pai", "sprinklerd", "aqualinkd"]
 
 # child -> [parents it depends on]. A child is only ever auto-enabled when
 # something that needs it is enabled; it is never enabled "just because".
 DEPENDENCIES: dict[str, list[str]] = {
-    "pai": ["mqtt"],
+    "pai": ["mqtt", "python311"],
     "sprinklerd": ["mqtt"],
     "aqualinkd": ["mqtt"],
 }

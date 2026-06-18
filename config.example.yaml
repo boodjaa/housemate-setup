@@ -29,6 +29,13 @@ wireguard:
   allowed_ips: 0.0.0.0/0
   persistent_keepalive: 25
 
+mqtt:
+  listener: 1883
+  allow_anonymous: true
+
+python311:
+  enabled: true
+
 # --- not yet implemented in this iteration -----------------------------
 # pai:
 #   enabled: true
@@ -40,6 +47,3 @@ wireguard:
 # aqualinkd:
 #   enabled: true
 #
-# mqtt:
-#   listener: 1883
-#   allow_anonymous: true
