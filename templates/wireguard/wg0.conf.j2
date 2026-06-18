@@ -1,0 +1,16 @@
+# Managed by the Pi Home Automation Appliance Provisioning Framework.
+# Manual edits will be overwritten if this content drifts from the
+# rendered template on a future run.
+
+[Interface]
+PrivateKey = {{ private_key }}
+Address = {{ address }}
+{% if dns %}
+DNS = {{ dns }}
+{% endif %}
+
+[Peer]
+PublicKey = {{ server_pubkey }}
+Endpoint = {{ endpoint }}
+AllowedIPs = {{ allowed_ips }}
+PersistentKeepalive = {{ persistent_keepalive }}

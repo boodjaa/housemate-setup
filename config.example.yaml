@@ -1,0 +1,45 @@
+# Example configuration for House-Mate provisioning
+# Create a copy of this file and make changes before running
+#
+#   sudo ./setup.py path-to-config.yaml
+#
+# Homebridge and WireGuard are mandatory and always installed,
+# as is basic system configuration.
+
+base:
+  hostname: raspberrypi
+  vnc: true
+
+homebridge:
+  client_id: default
+  port: 51826
+  pin: "123-45-678"
+  ui_port: 8581
+
+  plugins:
+    homebridge-shelly:
+      enabled: true
+    homebridge-camera-ui:
+      enabled: true
+
+wireguard:
+  endpoint: vpn.example.com:51820
+  server_pubkey: "rEHMVhHPkXWanRwZsfbIG3yeNHggOiZdeNpzPEzClBk="
+  address: 10.10.0.2/24
+  allowed_ips: 0.0.0.0/0
+  persistent_keepalive: 25
+
+# --- not yet implemented in this iteration -----------------------------
+# pai:
+#   enabled: true
+#   ip150_endpoint: 192.168.1.50
+#
+# sprinklerd:
+#   enabled: false
+#
+# aqualinkd:
+#   enabled: true
+#
+# mqtt:
+#   listener: 1883
+#   allow_anonymous: true
