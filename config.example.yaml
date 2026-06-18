@@ -19,7 +19,25 @@ homebridge:
   plugins:
     homebridge-shelly:
       enabled: true
-    homebridge-camera-ui:
+    homebridge-denon-tv:
+      enabled: true
+    homebridge-broadlink-rm-pro:
+      enabled: true
+    homebridge-mqttthing:
+      enabled: true
+    homebridge-camera-ffmpeg:
+      enabled: true
+    homebridge-daikin-local:
+      enabled: true
+    homebridge-google-nest-sdm:
+      enabled: true
+    homebridge-network-presence:
+      enabled: true
+    homebridge-samsung-tizen:
+      enabled: true
+    homebridge-sprinklerd:
+      enabled: true
+    homebridge-tahoma:
       enabled: true
 
 wireguard:
@@ -39,18 +57,11 @@ python311:
 pai:
   enabled: true
   endpoint: 192.168.1.50
-  pc_password: 0000
+  pc_password: "0000"
   mqtt_host: 127.0.0.1
   interface_password: paradox
 
-# --- not yet implemented in this iteration -----------------------------
-# pai:
-#   enabled: true
-#   ip150_endpoint: 192.168.1.50
-#
-# sprinklerd:
-#   enabled: false
-#
-# aqualinkd:
-#   enabled: true
-#
+aqualinkd:
+  enabled: true
+  panel_type: RS-8 Combo
+  mqtt_address: 127.0.0.1

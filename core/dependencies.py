@@ -86,6 +86,8 @@ def _ordered(enabled: set[str]) -> list[str]:
             order.append(name)
     if "mqtt" in enabled:
         order.append("mqtt")
+    if "python311" in enabled:
+        order.append("python311")
     for name in sorted(enabled - set(order)):
         order.append(name)
     return order
