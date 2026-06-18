@@ -112,6 +112,10 @@ class CommandRunner:
 
         if result.ok:
             self.logger.debug("OK: %s", printable)
+            if result.stdout.strip():
+                self.logger.debug("stdout (%s):\n%s", printable, result.stdout.rstrip())
+            if result.stderr.strip():
+                self.logger.debug("stderr (%s):\n%s", printable, result.stderr.rstrip())
         else:
             self.logger.error(
                 "Command failed (%s): %s\nstdout: %s\nstderr: %s",
