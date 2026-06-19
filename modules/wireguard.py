@@ -108,10 +108,6 @@ class WireGuardModule(Module):
     def enable(self) -> None:
         config_changed = getattr(self, "_last_configure_changed", False)
         self.runner.run(["systemctl", "enable", SERVICE_NAME], check=False)
-        if config_changed:
-            self.runner.run(["systemctl", "restart", SERVICE_NAME], check=False)
-        else:
-            self.runner.run(["systemctl", "start", SERVICE_NAME], check=False)
 
     # -- status -----------------------------------------------------------
     def status(self) -> bool:

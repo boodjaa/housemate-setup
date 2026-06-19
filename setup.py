@@ -189,15 +189,20 @@ def main(argv: list[str] | None = None) -> int:
 
     console.print()
 
+    console.print(f"VPN client will not run until reboot. To start now, run:")
+    console.print(f"[dim]systemctl start wg-quick@wg0[/dim]")
+
+    console.print()
+
     if wireguard_module is not None:
         public_key = getattr(wireguard_module, "_last_public_key", None)
         if public_key:
-            console.print(f"[bold]WireGuard Public Key:[/bold] {public_key}")
+            console.print(f"[bold]WireGuard Client Public Key:[/bold] {public_key}")
             console.print(f"  (also saved to ./wireguard_public_key.txt)")
 
     log_path = logger.handlers[0].baseFilename if logger.handlers else None
     if log_path:
-        console.print(f"[dim]Full log: {log_path}[/dim]")
+        console.print(f"[dim]Installation log saved to: {log_path}[/dim]")
     if args.dry_run:
         console.print("[dim]Dry-run output (rendered configs only, nothing installed): ./dry-run-output/[/dim]")
 
