@@ -5,7 +5,7 @@
     "port": {{ port }},
     "pin": "{{ pin }}"
   },
-  "accessories": [],
+  "accessories": {{ accessories | tojson(indent=2) | indent(2) }},
   "platforms": [
     {
       "name": "Config",

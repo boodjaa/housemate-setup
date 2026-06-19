@@ -12,36 +12,6 @@ base:
   vnc: true
   healthcheck: healthcheck-url-uid-here
 
-homebridge:
-  client_id: default
-  port: 51826
-  pin: "123-45-678"
-  ui_port: 8581
-
-  plugins:
-    homebridge-shelly:
-      enabled: true
-    homebridge-denon-tv:
-      enabled: true
-    homebridge-broadlink-rm-pro:
-      enabled: true
-    homebridge-mqttthing:
-      enabled: true
-    homebridge-camera-ffmpeg:
-      enabled: true
-    homebridge-daikin-local:
-      enabled: true
-    homebridge-google-nest-sdm:
-      enabled: true
-    homebridge-network-presence:
-      enabled: true
-    homebridge-samsung-tizen:
-      enabled: true
-    homebridge-sprinklerd:
-      enabled: true
-    homebridge-tahoma:
-      enabled: true
-
 wireguard:
   endpoint: vpn.example.com:51820
   server_pubkey: "rEHMVhHPkXWanRwZsfbIG3yeNHggOiZdeNpzPEzClBk="
@@ -52,9 +22,6 @@ wireguard:
 mqtt:
   listener: 1883
   allow_anonymous: true
-
-python311:
-  enabled: true
 
 pai:
   enabled: true
@@ -67,3 +34,64 @@ aqualinkd:
   enabled: true
   panel_type: RS-8 Combo
   mqtt_address: 127.0.0.1
+
+homebridge:
+  client_id: default
+  port: 51826
+  pin: "123-45-678"
+  ui_port: 8581
+
+  plugins:
+    homebridge-shelly:
+      enabled: true
+    homebridge-denon-tv:
+      enabled: true
+      acc_name: Main Room Amp
+      host: 192.168.0.254
+      generation: 1
+      zone: 4 # 4: Zone1+2
+    homebridge-broadlink-rm-pro:
+      enabled: true
+    homebridge-mqttthing:
+      enabled: true
+      host: 127.0.0.1:1883
+      accessories:
+        paradox_alarm:
+          name: Paradox Alarm
+          type: securitySystem
+          current_state: paradox/states/partitions/Area_1/current_state
+          get_target: paradox/states/partitions/Area_1/target_state
+          set_target: paradox/control/partitions/Area_1
+          target_values:
+            armed_home,
+            armed_away,
+            armed_night,
+            disarmed
+          current_values:
+            armed_home,
+            armed_away,
+            armed_night,
+            disarmed,
+            triggered
+          restrict_state: 0, 1, 2, 3
+        zone_1:
+          name: Zone 1
+          type: motionSensor
+          motion_detected: paradox/states/zones/Zone_01/open
+    homebridge-camera-ffmpeg:
+      enabled: true
+    homebridge-daikin-local:
+      enabled: true
+      acc_name: Daikin Aircon
+      fan_name: Kitchen Fan
+      api_route: 192.168.0.254
+    homebridge-google-nest-sdm:
+      enabled: true
+    homebridge-network-presence:
+      enabled: true
+    homebridge-samsung-tizen:
+      enabled: true
+    homebridge-sprinklerd:
+      enabled: true
+    homebridge-tahoma:
+      enabled: true
