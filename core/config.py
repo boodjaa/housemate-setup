@@ -97,7 +97,7 @@ def validate_config(config: dict[str, Any]) -> None:
     _require(base, "hostname", "base")
     _require(base, "vnc", "base")
     _require(base, "ssh", "base")
-    _require(base, "healthcheck", "base")
+    # _require(base, "healthcheck", "base")
 
     homebridge = config["homebridge"]
     _require_type(homebridge, dict, "homebridge", "homebridge")
