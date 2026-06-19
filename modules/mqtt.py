@@ -74,7 +74,6 @@ class MqttModule(Module):
             raise ModuleError(f"Failed to update {config_path}: {e}")
 
     def enable(self) -> None:
-        # Enable VNC Server
         if self.settings["enabled"]:
             self.runner.run(["systemctl", "enable", "mosquitto"])
 
