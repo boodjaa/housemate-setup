@@ -249,6 +249,19 @@ def transform_google_nest_sdm(plugin_cfg: dict) -> list[dict]:
         }
     }]
 
+# Shelly
+def transform_shelly(plugin_cfg: dict) -> list[dict]:
+    return [{
+        "name": "Shelly",
+        "admin": {
+            "enabled": True
+        },
+        "_bridge": {
+            "username": _generate_username(),
+            "port": 48366
+        }
+    }]
+
 # ---------------------------------------------------------------------------
 # Registries
 # ---------------------------------------------------------------------------
@@ -269,4 +282,5 @@ ACCESSORY_TRANSFORMERS: dict[str, callable] = {
 
 PLATFORM_TRANSFORMERS: dict[str, callable] = {
     "homebridge-google-nest-sdm": transform_google_nest_sdm,
+    "homebridge-shelly": transform_shelly
 }
