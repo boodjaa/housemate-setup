@@ -91,35 +91,51 @@ class HomebridgeModule(Module):
             return None
 
     def configure(self) -> bool:
-        from modules.homebridge_plugins import PLUGIN_TRANSFORMERS
+        from modules.homebridge_plugins import ACCESSORY_TRANSFORMERS, PLATFORM_TRANSFORMERS
         username = self._existing_username() or _generate_username()
         plugins = self.settings.get("plugins", {}) or {}
 
-        # Build the accessories list by running each enabled plugin's
-        # transformer (if it has one). Plugins without a transformer
-        # (simple ones that don't need per-accessory config) contribute
-        # nothing to the accessories array -- they just need to be
-        # installed via npm, which _ensure_plugin() handles below.
         accessories = []
+
+        # The config UI platform is always present -- it's the homebridge
+        # web UI itself, not an optional plugin. Seeding the list here
+        # (rather than hardcoding it in the template) means the template
+        # is a pure renderer and Python owns the full platforms structure.
+        platforms = [
+            {
+                "platform": "config",
+                "name":     "Config",
+                "port":     self.settings["ui_port"],
+            }
+        ]
+
         for plugin_name, plugin_cfg in plugins.items():
             if not (plugin_cfg or {}).get("enabled"):
                 continue
-            transformer = PLUGIN_TRANSFORMERS.get(plugin_name)
-            if transformer:
+
+            if plugin_name in ACCESSORY_TRANSFORMERS:
                 try:
-                    accessories.extend(transformer(plugin_cfg))
+                    accessories.extend(ACCESSORY_TRANSFORMERS[plugin_name](plugin_cfg))
                 except (ValueError, KeyError) as exc:
                     raise ModuleError(
                         f"Failed to build accessories config for {plugin_name}: {exc}"
                     ) from exc
 
+            elif plugin_name in PLATFORM_TRANSFORMERS:
+                try:
+                    platforms.extend(PLATFORM_TRANSFORMERS[plugin_name](plugin_cfg))
+                except (ValueError, KeyError) as exc:
+                    raise ModuleError(
+                        f"Failed to build platform config for {plugin_name}: {exc}"
+                    ) from exc
+
         context = {
-            "client_id": self.settings["client_id"],
+            "client_id":   self.settings["client_id"],
             "port":        self.settings["port"],
             "pin":         self.settings["pin"],
             "username":    username,
             "accessories": accessories,
-            "ui_port":        self.settings["ui_port"],
+            "platforms":   platforms,
         }
         changed = self.templates.render_to_file("homebridge/config.json.j2", context, CONFIG_PATH)
 
@@ -127,10 +143,6 @@ class HomebridgeModule(Module):
         return changed
 
     def _ensure_plugin(self, plugin_name: str) -> None:
-        # check = self.runner.query(["npm", "list", "-g", plugin_name, "--depth=0"])
-        # if check.ok:
-        #     self.logger.info("Plugin %s already installed, skipping", plugin_name)
-        #     return
         try:
             self.runner.run(["hb-service", "add", plugin_name])
         except CommandError as exc:
@@ -139,7 +151,6 @@ class HomebridgeModule(Module):
     # -- enable -------------------------------------------------------------
     def enable(self) -> None:
         config_changed = getattr(self, "_last_configure_changed", False)
-        # self.runner.run(["hb-service", "start"], check=False)
         if config_changed:
             self.runner.run(["hb-service", "restart"], check=False)
         else:

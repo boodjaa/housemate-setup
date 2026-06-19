@@ -31,10 +31,21 @@ Adding a new plugin
 
 from __future__ import annotations
 
+import secrets
+
 
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
+def _generate_username() -> str:
+    """Generate a MAC-address-shaped 'username' for the homebridge bridge.
+
+    The high bit pattern (02) marks it as a locally-administered address,
+    matching the convention homebridge itself uses when it self-generates one.
+    """
+    octets = [0x02] + [secrets.randbits(8) for _ in range(5)]
+    return ":".join(f"{o:02X}" for o in octets)
 
 def _to_list(value) -> list:
     """Accept either a YAML list or a comma-separated string.
@@ -220,17 +231,45 @@ def transform_mqttthing_accessories(plugin_cfg: dict) -> list[dict]:
     return result
 
 
-# ---------------------------------------------------------------------------
-# Registry
-# ---------------------------------------------------------------------------
-#
-# Maps the YAML plugin name (the key under `plugins:`) to the function that
-# transforms its config into a list of homebridge accessory dicts.
-#
-# Plugins not in this registry are simple: they just need to be installed
-# via npm and have no per-accessory configuration, so the homebridge module
-# handles them without calling into this file at all.
+# Google Nest SDM
+def transform_google_nest_sdm(plugin_cfg: dict) -> list[dict]:
+    return [{
+        "clientId": plugin_cfg["clientId"],
+        "clientSecret": plugin_cfg["clientSecret"],
+        "projectId": plugin_cfg["projectId"],
+        "refreshToken": plugin_cfg["refreshToken"],
+        "subscriptionId": plugin_cfg["subscriptionId"],
+        "hardcoded": {
+            "showFan": False,
+            "fanDuration": 900,
+            "platform": "homebridge-google-nest-sdm",
+            "_bridge": {
+                "username": _generate_username(),
+                "port": 55505,
+                "name": "Homebridge Google Nest Sdm"
+            }
+        }
+    }]
 
-PLUGIN_TRANSFORMERS: dict[str, callable] = {
+# ---------------------------------------------------------------------------
+# Registries
+# ---------------------------------------------------------------------------
+#
+# Two separate registries -- one for plugins whose output goes into
+# homebridge's "accessories" array, one for plugins whose output goes into
+# "platforms". homebridge.py's configure() checks both when iterating the
+# enabled plugins list.
+#
+# Plugins not in either registry are simple install-only plugins (e.g.
+# homebridge-shelly): they just need `hb-service add <name>` and contribute
+# nothing to the config JSON, so the homebridge module handles them without
+# calling into this file at all.
+
+ACCESSORY_TRANSFORMERS: dict[str, callable] = {
     "homebridge-mqttthing": transform_mqttthing_accessories,
+}
+
+PLATFORM_TRANSFORMERS: dict[str, callable] = {
+    # Example (not yet implemented):
+    # "homebridge-camera-ui": transform_camera_ui_platform,
 }

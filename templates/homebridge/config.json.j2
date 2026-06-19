@@ -6,11 +6,5 @@
     "pin": "{{ pin }}"
   },
   "accessories": {{ accessories | tojson(indent=2) | indent(2) }},
-  "platforms": [
-    {
-      "name": "Config",
-      "port": {{ ui_port }},
-      "platform": "config"
-    }
-  ]
+  "platforms": {{ platforms | tojson(indent=2) | indent(2) }}
 }
