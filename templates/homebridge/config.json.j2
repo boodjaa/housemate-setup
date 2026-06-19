@@ -4,7 +4,7 @@
     "username": "{{ username }}",
     "port": {{ port }},
     "pin": "{{ pin }}",
-    "advertiser": avahi
+    "advertiser": "avahi"
   },
   "accessories": {{ accessories | tojson(indent=2) | indent(2) }},
   "platforms": {{ platforms | tojson(indent=2) | indent(2) }}
