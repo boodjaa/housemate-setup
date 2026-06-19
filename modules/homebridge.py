@@ -119,6 +119,7 @@ class HomebridgeModule(Module):
             "pin":         self.settings["pin"],
             "username":    username,
             "accessories": accessories,
+            "ui_port":        self.settings["ui_port"],
         }
         changed = self.templates.render_to_file("homebridge/config.json.j2", context, CONFIG_PATH)
 
