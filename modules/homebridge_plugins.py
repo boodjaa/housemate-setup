@@ -239,15 +239,13 @@ def transform_google_nest_sdm(plugin_cfg: dict) -> list[dict]:
         "projectId": plugin_cfg["projectId"],
         "refreshToken": plugin_cfg["refreshToken"],
         "subscriptionId": plugin_cfg["subscriptionId"],
-        "hardcoded": {
-            "showFan": False,
-            "fanDuration": 900,
-            "platform": "homebridge-google-nest-sdm",
-            "_bridge": {
-                "username": _generate_username(),
-                "port": 55505,
-                "name": "Homebridge Google Nest Sdm"
-            }
+        "showFan": False,
+        "fanDuration": 900,
+        "platform": "homebridge-google-nest-sdm",
+        "_bridge": {
+            "username": _generate_username(),
+            "port": 55505,
+            "name": "Homebridge Google Nest Sdm"
         }
     }]
 
