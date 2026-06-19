@@ -270,6 +270,5 @@ ACCESSORY_TRANSFORMERS: dict[str, callable] = {
 }
 
 PLATFORM_TRANSFORMERS: dict[str, callable] = {
-    # Example (not yet implemented):
-    # "homebridge-camera-ui": transform_camera_ui_platform,
+    "homebridge-google-nest-sdm": transform_google_nest_sdm,
 }
