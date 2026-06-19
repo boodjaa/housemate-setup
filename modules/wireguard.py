@@ -39,7 +39,7 @@ class WireGuardModule(Module):
     # -- install -----------------------------------------------------------
     def install(self) -> None:
         missing = [
-            pkg for pkg in ("wireguard", "wireguard-tools")
+            pkg for pkg in ("wireguard", "wireguard-tools", "resolvconf")
             if not self.runner.package_installed(pkg)
         ]
         if not missing:
