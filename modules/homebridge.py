@@ -114,7 +114,7 @@ class HomebridgeModule(Module):
                     ) from exc
 
         context = {
-            "bridge_name": self.settings["bridge_name"],
+            "client_id": self.settings["client_id"],
             "port":        self.settings["port"],
             "pin":         self.settings["pin"],
             "username":    username,
