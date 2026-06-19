@@ -252,7 +252,7 @@ def transform_google_nest_sdm(plugin_cfg: dict) -> list[dict]:
 # Shelly
 def transform_shelly(plugin_cfg: dict) -> list[dict]:
     return [{
-        "platform": "Shelly",
+        
         "name": "Shelly",
         "admin": {
             "enabled": True
