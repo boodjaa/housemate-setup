@@ -30,7 +30,7 @@ class MqttModule(Module):
     def configure(self) -> None:
         config_path = "/etc/mosquitto/mosquitto.conf"
         listener = self.settings.get("listener", "")
-        allow_anonymous = self.settings.get("allow_anonymous", "")
+        allow_anonymous = self.settings["allow_anonymous"]
 
         # Update mosquitto config with settings from config.yaml
         try:
@@ -81,6 +81,7 @@ class MqttModule(Module):
     def enable(self) -> None:
         if self.settings["enabled"]:
             self.runner.run(["systemctl", "enable", "mosquitto"])
+            self.runner.run(["systemctl", "start", "mosquitto"])
 
     def status(self) -> None:
         pass
