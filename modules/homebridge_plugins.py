@@ -73,7 +73,8 @@ def _mqtt_url(host: str) -> str:
 def _snake_to_camel(s: str) -> str:
     if not s == "temperature_unit":
         parts = s.split("_")
-    return parts[0] + "".join(p.capitalize() for p in parts[1:])
+        return parts[0] + "".join(p.capitalize() for p in parts[1:])
+    return s
 
 
 def _camel_dict(d: dict) -> dict:
