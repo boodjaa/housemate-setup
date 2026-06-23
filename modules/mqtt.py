@@ -80,7 +80,7 @@ class MqttModule(Module):
     def enable(self) -> None:
         if self.settings.get("enabled"):
             self.runner.run(["systemctl", "enable", "mosquitto"])
-            self.runner.run(["systemctl", "start", "mosquitto"])
+            self.runner.run(["systemctl", "restart", "mosquitto"])
 
     def status(self) -> None:
         pass
