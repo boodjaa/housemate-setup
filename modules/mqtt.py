@@ -12,25 +12,29 @@ class MqttModule(Module):
 
     def validate(self) -> None:
         # Ensure config exists
-        listener = self.settings.get("listener", "")
-        allow_anonymous = self.settings.get("allow_anonymous", "")
+        listener = self.settings.get("listener")
+        allow_anonymous = self.settings.get("allow_anonymous")
 
-        if not(listener or allow_anonymous):
+        # Check if keys exist in the dictionary
+        if listener is None or allow_anonymous is None:
             raise ModuleError(
-                "Invalid mqtt configuration in config.yaml. (Expected 'listener' and 'allow_anonymous' values.))"
+                "Invalid mqtt configuration in config.yaml. (Expected 'listener' and 'allow_anonymous' values.)"
             )
         
-    
     def install(self) -> None:
         # Install mosquitto server package
-        if self.settings["enabled"]:
+        if self.settings.get("enabled"):
             self.runner.run_apt(["update"])
             self.runner.run_apt(["install", "-y", "mosquitto"])
 
     def configure(self) -> None:
         config_path = "/etc/mosquitto/mosquitto.conf"
         listener = self.settings.get("listener", "")
-        allow_anonymous = self.settings["allow_anonymous"]
+        allow_anonymous = self.settings.get("allow_anonymous", False)
+
+        # Normalize the value to handle YAML booleans (True) and strings ("true", "yes")
+        is_anonymous_allowed = str(allow_anonymous).lower() in ("true", "yes", "on", "1")
+        anon_val_str = "true" if is_anonymous_allowed else "false"
 
         # Update mosquitto config with settings from config.yaml
         try:
@@ -57,20 +61,15 @@ class MqttModule(Module):
                 if directive == "listener" and listener:
                     lines[i] = f"listener {listener}{ending}"
                     listener_found = True
-                elif directive == "allow_anonymous" and allow_anonymous  == "true":
-                    lines[i] = f"allow_anonymous true{ending}"
-                    anonymous_found = True
                 elif directive == "allow_anonymous":
-                    lines[i] = f"allow_anonymous false{ending}"
+                    lines[i] = f"allow_anonymous {anon_val_str}{ending}"
                     anonymous_found = True
 
-            # Append missing directives if they weren't found and have values to set
+            # Append missing directives if they weren't found
             if not listener_found and listener:
                 lines.append(f"listener {listener}\n")
-            if not anonymous_found and allow_anonymous == "true":
-                lines.append(f"allow_anonymous true\n")
-            elif not anonymous_found:
-                lines.append(f"allow_anonymous false\n")
+            if not anonymous_found:
+                lines.append(f"allow_anonymous {anon_val_str}\n")
                 
             with open(config_path, "w") as f:
                 f.writelines(lines)
@@ -79,7 +78,7 @@ class MqttModule(Module):
             raise ModuleError(f"Failed to update {config_path}: {e}")
 
     def enable(self) -> None:
-        if self.settings["enabled"]:
+        if self.settings.get("enabled"):
             self.runner.run(["systemctl", "enable", "mosquitto"])
             self.runner.run(["systemctl", "start", "mosquitto"])
 
