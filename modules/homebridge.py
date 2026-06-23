@@ -126,7 +126,7 @@ class HomebridgeModule(Module):
             # else: not in either registry = install-only plugin, no config entry
 
         context = {
-            "client_id":   self.settings["client_id"],
+            "client_id":   "Homebridge " + self.settings["client_id"],
             "port":        self.settings["port"],
             "pin":         self.settings["pin"],
             "username":    username,

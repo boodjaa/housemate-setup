@@ -3,7 +3,8 @@
     "name": "{{ client_id }}",
     "username": "{{ username }}",
     "port": {{ port }},
-    "pin": "{{ pin }}"
+    "pin": "{{ pin }}",
+    "advertiser": "avahi"
   },
   "accessories": {{ accessories | tojson(indent=2) | indent(2) }},
   "platforms": {{ platforms | tojson(indent=2) | indent(2) }}
