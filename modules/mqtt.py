@@ -57,15 +57,20 @@ class MqttModule(Module):
                 if directive == "listener" and listener:
                     lines[i] = f"listener {listener}{ending}"
                     listener_found = True
-                elif directive == "allow_anonymous" and allow_anonymous:
-                    lines[i] = f"allow_anonymous {allow_anonymous}{ending}"
+                elif directive == "allow_anonymous" and allow_anonymous  == "true":
+                    lines[i] = f"allow_anonymous true{ending}"
+                    anonymous_found = True
+                elif directive == "allow_anonymous":
+                    lines[i] = f"allow_anonymous false{ending}"
                     anonymous_found = True
 
             # Append missing directives if they weren't found and have values to set
             if not listener_found and listener:
                 lines.append(f"listener {listener}\n")
-            if not anonymous_found and allow_anonymous:
-                lines.append(f"allow_anonymous {allow_anonymous}\n")
+            if not anonymous_found and allow_anonymous == "true":
+                lines.append(f"allow_anonymous true\n")
+            elif not anonymous_found:
+                lines.append(f"allow_anonymous false\n")
                 
             with open(config_path, "w") as f:
                 f.writelines(lines)
