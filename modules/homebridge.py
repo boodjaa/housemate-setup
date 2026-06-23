@@ -91,43 +91,39 @@ class HomebridgeModule(Module):
             return None
 
     def configure(self) -> bool:
-        from modules.homebridge_plugins import ACCESSORY_TRANSFORMERS, PLATFORM_TRANSFORMERS
+        from modules.homebridge_plugins import (
+            ACCESSORY_TRANSFORMERS, PLATFORM_TRANSFORMERS, apply_plugin,
+        )
         username = self._existing_username() or _generate_username()
         plugins = self.settings.get("plugins", {}) or {}
 
         accessories = []
-
-        # The config UI platform is always present -- it's the homebridge
-        # web UI itself, not an optional plugin. Seeding the list here
-        # (rather than hardcoding it in the template) means the template
-        # is a pure renderer and Python owns the full platforms structure.
-        platforms = [
-            {
-                "platform": "config",
-                "name":     "Config",
-                "port":     self.settings["ui_port"],
-            }
-        ]
+        # The config UI platform is always present -- seeded here rather
+        # than hardcoded in the template so Python owns the full structure.
+        platforms = [{
+            "platform": "config",
+            "name":     "Config",
+            "port":     self.settings["ui_port"],
+        }]
 
         for plugin_name, plugin_cfg in plugins.items():
             if not (plugin_cfg or {}).get("enabled"):
                 continue
+            try:
+                output_type, results = apply_plugin(
+                    plugin_name, plugin_cfg,
+                    ACCESSORY_TRANSFORMERS, PLATFORM_TRANSFORMERS,
+                )
+            except (ValueError, KeyError) as exc:
+                raise ModuleError(
+                    f"Failed to build config for plugin '{plugin_name}': {exc}"
+                ) from exc
 
-            if plugin_name in ACCESSORY_TRANSFORMERS:
-                try:
-                    accessories.extend(ACCESSORY_TRANSFORMERS[plugin_name](plugin_cfg))
-                except (ValueError, KeyError) as exc:
-                    raise ModuleError(
-                        f"Failed to build accessories config for {plugin_name}: {exc}"
-                    ) from exc
-
-            elif plugin_name in PLATFORM_TRANSFORMERS:
-                try:
-                    platforms.extend(PLATFORM_TRANSFORMERS[plugin_name](plugin_cfg))
-                except (ValueError, KeyError) as exc:
-                    raise ModuleError(
-                        f"Failed to build platform config for {plugin_name}: {exc}"
-                    ) from exc
+            if output_type == "accessories":
+                accessories.extend(results)
+            elif output_type == "platforms":
+                platforms.extend(results)
+            # else: not in either registry = install-only plugin, no config entry
 
         context = {
             "client_id":   self.settings["client_id"],
@@ -138,7 +134,6 @@ class HomebridgeModule(Module):
             "platforms":   platforms,
         }
         changed = self.templates.render_to_file("homebridge/config.json.j2", context, CONFIG_PATH)
-
         self._last_configure_changed = changed
         return changed
 

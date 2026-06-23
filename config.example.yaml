@@ -42,56 +42,112 @@ homebridge:
   ui_port: 8581
 
   plugins:
-    homebridge-shelly:
-      enabled: true
-    homebridge-denon-tv:
-      enabled: true
-      acc_name: Main Room Amp
-      host: 192.168.0.254
-      generation: 1
-      zone: 4 # 4: Zone1+2
-    homebridge-broadlink-rm-pro:
-      enabled: true
+    # ---------------------------------------------------------
+    # CUSTOM TRANSFORMERS (Complex Logic)
+    # ---------------------------------------------------------
+
     homebridge-mqttthing:
       enabled: true
-      host: 127.0.0.1:1883
-      accessories:
-        paradox_alarm:
-          name: Paradox Alarm
-          type: securitySystem
-          current_state: paradox/states/partitions/Area_1/current_state
-          get_target: paradox/states/partitions/Area_1/target_state
-          set_target: paradox/control/partitions/Area_1
-          target_values:
-            armed_home,
-            armed_away,
-            armed_night,
-            disarmed
-          current_values:
-            armed_home,
-            armed_away,
-            armed_night,
-            disarmed,
-            triggered
-          restrict_state: 0, 1, 2, 3
-        zone_1:
-          name: Zone 1
-          type: motionSensor
-          motion_detected: paradox/states/zones/Zone_01/open
+      # host: "127.0.0.1:1883"  # Optional. Defaults to 127.0.0.1:1883. 
+                                # "mqtt://" prefix is added automatically if missing.
+      accessories:              # Required. Dictionary of arbitrary keys -> accessory configs.
+        paradox_alarm:          # Arbitrary key
+          name: "Paradox Alarm" # Required
+          type: "securitySystem" # Required. Allowed: securitySystem, motionSensor, contactSensor, switch, lightbulb
+          current_state: "paradox/states/partitions/Area_1/current_state"
+          get_target: "paradox/states/partitions/Area_1/target_state"
+          set_target: "paradox/control/partitions/Area_1"
+          # Optional arrays (comma-separated strings or lists work)
+          target_values: "armed_home, armed_away, armed_night, disarmed"
+          current_values: "armed_home, armed_away, armed_night, disarmed, triggered"
+          restrict_state: "0, 1, 2, 3" 
+        motion_sensor_1:
+          name: "Zone 1 Motion"
+          type: "motionSensor"
+          motion_detected: "paradox/states/zones/Zone_01/open"
+          # Note: onValue/offValue are hardcoded to "True"/"False" for this type
+
+    homebridge-denon-tv:
+      enabled: true
+      # name: "Denon TV"        # Optional. Defaults to "Denon TV".
+      # child_bridge: true      # Optional framework field
+      devices:                  # Required. Dictionary of arbitrary keys -> device configs.
+        living_room_avr:        # Arbitrary key
+          name: "Living Room AVR" # Required
+          host: "192.168.0.254"   # Required
+          zone_control: 0         # Optional (becomes zoneControl)
+          generation: 1           # Optional
+          info_button_command: "MNMEN ON" # Optional (becomes infoButtonCommand)
+          # power:                # Optional dict (snake_case keys auto-converted)
+          #   on: "PWON"
+          # volume:               # Optional dict
+          #   up: "MVUP"
+          # buttons:              # Optional list of dicts
+          #   - name: "Netflix"
+          #     command: "NS9B"
+
+    # ---------------------------------------------------------
+    # DECLARATIVE TRANSFORMERS (Flat / Auto-Converted)
+    # ---------------------------------------------------------
+    # Rule: All fields (except framework ones) pass through.
+    # Rule: snake_case automatically becomes camelCase.
+
+    homebridge-2-0-shelly:
+      enabled: true
+      # admin:                  # Hardcoded to {"enabled": true} by the transformer!
+      #   enabled: true
+      some_custom_field: "value" # Becomes someCustomField in JSON
+
     homebridge-camera-ffmpeg:
       enabled: true
+      cameras:                  # Passed through as a list
+        - name: "Front Door"
+          source: "-rtsp_transport tcp -i rtsp://192.168.1.10/stream"
+
     homebridge-daikin-local:
       enabled: true
-      acc_name: Daikin Aircon
-      fan_name: Kitchen Fan
-      api_route: 192.168.0.254
+      api_route: "192.168.0.254" # Becomes apiRoute in JSON
+
     homebridge-google-nest-sdm:
+      enabled: true
+      project_id: "your-project-id" # Becomes projectId in JSON
+
+    homebridge-broadlink-rm:
+      enabled: true
+      hosts:
+        - address: "192.168.1.20"
+
+    homebridge-samsung-tizen:
+      enabled: true
+      devices:
+        - name: "Samsung TV"
+          ip: "192.168.1.30"
+          mac: "AA:BB:CC:DD:EE:FF"
+
+    # --- The following plugins accept standard flat/nested fields ---
+    homebridge-kasa-python:
+      enabled: true
+    homebridge-google-smarthome:
+      enabled: true
+    homebridge-landroid:
+      enabled: true
+    homebridge-appletv-enhanced:
+      enabled: true
+    homebridge-connexoon:
+      enabled: true
+    homebridge-tahoma:
+      enabled: true
+    homebridge-plex:
+      enabled: true
+    homebridge-weather-plus:
       enabled: true
     homebridge-network-presence:
       enabled: true
-    homebridge-samsung-tizen:
+    homebridge-tplink-smarthome:
       enabled: true
-    homebridge-sprinklerd:
+    homebridge-tapo:
       enabled: true
-    homebridge-tahoma:
+    homebridge-hisense-tv:
+      enabled: true
+    homebridge-ueboom:
       enabled: true
