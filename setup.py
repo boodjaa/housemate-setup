@@ -104,7 +104,8 @@ def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
     console = Console()
 
-    console.print("[bold]====================\n= House-Mate Setup =\n====================[/bold]")
+    console.print("[bold]House-Mate Setup[/bold]")
+    console.print("To follow live log, run: [pink]tail -f /var/log/housemate-setup.log[/pink]\n")
 
     try:
         config = load_config(args.config)
