@@ -392,7 +392,7 @@ PLATFORM_TRANSFORMERS: dict[str, PluginSchema | Callable] = {
     "homebridge-denon-tv":         transform_denon_tv_platform,  # per-device defaults
 
     # ---- flat plugins -------------------------------------------------------
-    "homebridge-2-0-shelly":           PluginSchema("Shelly", hardcoded={"admin": {"enabled": True}}),
+    "homebridge-2-0-shelly":           PluginSchema("homebridge-2-0-shelly.Shelly", hardcoded={"admin": {"enabled": True}}),
     "homebridge-kasa-python":      PluginSchema("KasaPython"),
     "homebridge-google-smarthome": PluginSchema("google-smarthome"),
     "homebridge-landroid":         PluginSchema("Lannœdroid"),
