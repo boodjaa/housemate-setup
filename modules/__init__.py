@@ -16,6 +16,10 @@ from __future__ import annotations
 from modules.sysconfig import SysconfigModule
 from modules.homebridge import HomebridgeModule
 from modules.wireguard import WireGuardModule
+<<<<<<< HEAD
+=======
+from modules.nodered import NoderedModule
+>>>>>>> b636e19 (Add nodeRED module)
 from modules.mqtt import MqttModule
 from modules.python311 import Python311Module
 from modules.pai import PaiModule
@@ -25,6 +29,10 @@ MODULE_REGISTRY: dict[str, type] = {
     "base": SysconfigModule,
     "homebridge": HomebridgeModule,
     "wireguard": WireGuardModule,
+<<<<<<< HEAD
+=======
+    "nodered": NoderedModule,
+>>>>>>> b636e19 (Add nodeRED module)
     "mqtt": MqttModule,
     "pai": PaiModule,
     "python311": Python311Module,
