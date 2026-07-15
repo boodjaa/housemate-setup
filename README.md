@@ -1,5 +1,4 @@
-# HM Provisioning Script
-
+# The Configurator
 ## Install Guide
 [Installation Guide](https://github.com/boodjaa/housemate-setup/wiki)
 
