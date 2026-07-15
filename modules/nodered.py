@@ -75,14 +75,26 @@ class NoderedModule(Module):
             self.runner.run(
                 [
                     "runuser", "-u", user, "--",
-                    "bash", script_path, "--confirm-install", "--confirm-pi",
+                    "bash", script_path, "--confirm-install", "--confirm-pi", "--node24",
                 ],
                 timeout=1800,   # installs Node.js + npm packages; can be slow
             )
 
     # -- configure -----------------------------------------------------------
     def configure(self) -> bool:
-        # Nothing to render yet -- the installer ships its own service file.
+        plugins = self.settings.get("plugins", {})
+
+        for plugin_name, plugin_cfg in plugins.items():
+            if not plugin_cfg.get("enabled"):
+                continue
+            self._ensure_plugin(plugin_name)
+
+    def _ensure_plugin(self, plugin_name: str) -> None:
+        try:
+            self.runner.run(["npm", "install", "--prefix", "/home/admin/.node-red", plugin_name])
+        except CommandError as exc:
+            raise ModuleError(f"Failed to install plugin '{plugin_name}': {exc}") from exc
+
         return False
 
     # -- enable --------------------------------------------------------------

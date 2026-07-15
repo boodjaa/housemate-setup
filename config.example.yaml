@@ -19,7 +19,7 @@ homebridge:
   ui_port: 8581
 
   plugins:
-    homebridge-shelly:
+    homebridge-2-0-shelly:
       enabled: true
     homebridge-denon-tv:
       enabled: true
@@ -50,11 +50,15 @@ wireguard:
   persistent_keepalive: 25
 
 mqtt:
+  enabled: true
   listener: 1883
   allow_anonymous: true
 
-python311:
+nodered:
   enabled: true
+  plugins:
+    node-red-contrib-homebridge-automation:
+      enabled: true
 
 pai:
   enabled: true
