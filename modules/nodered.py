@@ -22,6 +22,7 @@ from __future__ import annotations
 import os
 import tempfile
 from pathlib import Path
+import shutil
 
 from modules.base import Module, ModuleError
 
@@ -42,8 +43,7 @@ class NoderedModule(Module):
     # -- install -------------------------------------------------------------
     def install(self) -> None:
         if self._is_installed():
-            self.logger.info("node-red already installed, skipping install")
-            return
+            self.logger.info("node-red already installed, updating...")
 
         user = self._invoking_user()
         if user is None:
@@ -82,12 +82,26 @@ class NoderedModule(Module):
 
     # -- configure -----------------------------------------------------------
     def configure(self) -> bool:
+        # Install Plugins
         plugins = self.settings.get("plugins", {})
 
         for plugin_name, plugin_cfg in plugins.items():
             if not plugin_cfg.get("enabled"):
                 continue
             self._ensure_plugin(plugin_name)
+
+        # Feed existing flows.json
+        flows = self.settings.get("flows")
+
+        if flows:
+            src = Path(self.settings["flows"])
+            dest = Path("/home/admin/.node-red") / "flows.json"
+
+            if dest.exists:
+                self.logger.log(f"Skipped {str(src)}... flows.json already exists.")
+            else:
+                shutil.copy2(src, dest)
+                self.logger.log(f"Copied {str(src)} to {str(dest)}.")
 
     def _ensure_plugin(self, plugin_name: str) -> None:
         try:
