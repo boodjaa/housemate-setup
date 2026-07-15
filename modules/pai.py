@@ -89,7 +89,7 @@ class PaiModule(Module):
             return f"'{str(val)}'"
 
         context = {
-            "endpoint": _fmt(self.settings.get("endpoint")),
+            "serial_port": _fmt(self.settings.get("serial_port")),
             "pc_password": _fmt(self.settings.get("pc_password")),
             "mqtt_host": _fmt(self.settings.get("mqtt_host")),
             "interface_password": _fmt(self.settings.get("interface_password")),

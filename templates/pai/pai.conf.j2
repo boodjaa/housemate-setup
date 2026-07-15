@@ -22,19 +22,19 @@ import logging
 # DEVELOPMENT_DUMP_MEMORY = False
 #
 ### Connection Type
-CONNECTION_TYPE = 'IP'   # Serial or IP
+CONNECTION_TYPE = 'Serial'   # Serial or IP
 #
 ### Serial Connection Details
-# SERIAL_PORT = '/dev/ttyS1' # Pathname of the Serial Port
-# SERIAL_BAUD = 9600              # 9600 for SP/MG. For EVO: Use 38400(default setting) or 57600
+SERIAL_PORT = '{{ serial_port }}' # Pathname of the Serial Port
+SERIAL_BAUD = 9600              # 9600 for SP/MG. For EVO: Use 38400(default setting) or 57600
 #
 ### IP Connection Details
-IP_CONNECTION_HOST = {{ endpoint }} # IP Module address when using direct IP Connection
-IP_CONNECTION_PORT = 10000    # IP Module port when using direct IP Connection
-IP_CONNECTION_PASSWORD = 'paradox' # IP Module password. "paradox" is default.
+#IP_CONNECTION_HOST = {{ endpoint }} # IP Module address when using direct IP Connection
+#IP_CONNECTION_PORT = 10000    # IP Module port when using direct IP Connection
+#IP_CONNECTION_PASSWORD = 'paradox' # IP Module password. "paradox" is default.
 #IP_CONNECTION_SITEID = None # SITE ID. IF defined, connection will be made through this method.
 #IP_CONNECTION_EMAIL = None # Email registered in the site
-IP_CONNECTION_PANEL_SERIAL = None  # Use a specific panel. Set it to None to use the first
+#IP_CONNECTION_PANEL_SERIAL = None  # Use a specific panel. Set it to None to use the first
 #IP_CONNECTION_BARE = False      # No not expect an IP150 module. Used this for base Serial over TCP tunnels
 #
 ### Paradox
