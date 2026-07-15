@@ -69,7 +69,7 @@ class NoderedModule(Module):
 
             # The temp dir is owned by root; make the script readable by the
             # target user so runuser can execute it.
-            self.runner.run(["chmod", "755", Path(tmp)])
+            self.runner.run(["chmod", "755", str(Path(tmp))])
             self.runner.run(["chmod", "644", script_path])
 
             # Drop from root to the original user for the actual install.
