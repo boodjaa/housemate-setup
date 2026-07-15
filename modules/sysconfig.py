@@ -47,6 +47,10 @@ class SysconfigModule(Module):
             raise ModuleError("base.healthcheck, if set, can't be an empty string")
 
     def install(self) -> None:
+        # Update and Upgrade system before we begin
+        self.runner.run_apt(["update"])
+        self.runner.run_apt(["upgrade", "-y"])
+
         # cron ships by default on Raspberry Pi OS, but check anyway rather
         # than assume -- consistent with how every other module treats its
         # own package dependencies.
