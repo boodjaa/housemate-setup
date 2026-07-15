@@ -1,17 +1,7 @@
 # HM Provisioning Script
 
-## Setup
-
-On the client:
-
-```bash
-git clone https://github.com/boodjaa/housemate-setup
-cd housemate-setup
-sudo apt install python3-yaml python3-jinja2 python3-rich # should already be installed but do it to be sure
-cp config.example.yaml config.yaml
-# edit config.yaml with settings
-sudo ./setup.py config.yaml
-```
+## Install Guide
+[Installation Guide](https://github.com/boodjaa/housemate-setup/wiki)
 
 ## Features
 Installs:
@@ -20,6 +10,7 @@ Installs:
 - Mosquitto ✓
 - Python 3.11.15 ✓ (from source, takes ages - will skip if already installed)
 - PAI ✓
+- node-RED ✓
 - AqualinkD ✓
 - SprinklerD ✗
 
@@ -32,6 +23,7 @@ Configures:
   - Health check ping ✓
 - Systemd autostart units ✓
 - Homebridge ✓
+    - Plugins ✓
 - WireGuard ✓
 - Mosquitto ✓
 - PAI ✓
