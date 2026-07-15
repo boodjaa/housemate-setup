@@ -7,13 +7,13 @@
 # as is basic system configuration.
 
 base:
-  hostname: raspberrypi
+  hostname: BridgeDefault
   ssh: true
   vnc: true
   healthcheck: healthcheck-url-uid-here
 
 homebridge:
-  client_id: default
+  client_id: Default
   port: 51826
   pin: "123-45-678"
   ui_port: 8581
@@ -45,8 +45,8 @@ homebridge:
 wireguard:
   endpoint: vpn.example.com:51820
   server_pubkey: "rEHMVhHPkXWanRwZsfbIG3yeNHggOiZdeNpzPEzClBk="
-  address: 10.10.0.2/24
-  allowed_ips: 0.0.0.0/0
+  address: 10.100.0.2/24
+  allowed_ips: 10.100.0.1/32
   persistent_keepalive: 25
 
 mqtt:
@@ -56,13 +56,18 @@ mqtt:
 
 nodered:
   enabled: true
+  flows: flows-example.json   # File should be in same directory as setup.py
   plugins:
     node-red-contrib-homebridge-automation:
+      enabled: true
+    node-red-contrib-homekit-bridged:
+      enabled: true
+    node-red-contrib-eztimer:
       enabled: true
 
 pai:
   enabled: true
-  endpoint: 192.168.1.50
+  serial_port: /dev/ttyUSB0
   pc_password: "0000"
   mqtt_host: 127.0.0.1
   interface_password: paradox
