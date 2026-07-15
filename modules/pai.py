@@ -50,7 +50,7 @@ class PaiModule(Module):
     required = False
 
     def validate(self) -> None:
-        required_keys = ["endpoint", "pc_password", "mqtt_host", "interface_password"]
+        required_keys = ["serial_port", "pc_password", "mqtt_host", "interface_password"]
         for key in required_keys:
             if key not in self.settings:
                 raise ModuleError(f"Missing required PAI setting: '{key}'")
