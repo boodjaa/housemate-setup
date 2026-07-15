@@ -44,6 +44,7 @@ class NoderedModule(Module):
     def install(self) -> None:
         if self._is_installed():
             self.logger.info("node-red already installed, updating...")
+            return
 
         user = self._invoking_user()
         if user is None:
@@ -97,7 +98,7 @@ class NoderedModule(Module):
             src = Path(self.settings["flows"])
             dest = Path("/home/admin/.node-red") / "flows.json"
 
-            if dest.exists:
+            if dest.exists():
                 self.logger.info(f"Skipped {str(src)}... flows.json already exists.")
             else:
                 shutil.copy2(src, dest)
