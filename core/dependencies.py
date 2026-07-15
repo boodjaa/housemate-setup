@@ -16,11 +16,7 @@ import logging
 REQUIRED_MODULES: list[str] = ["base", "homebridge", "wireguard"]
 
 # Modules a user can opt into via `<name>: {enabled: true}` in the YAML.
-<<<<<<< HEAD
-OPTIONAL_MODULES: list[str] = ["mqtt", "python311", "pai", "sprinklerd", "aqualinkd"]
-=======
 OPTIONAL_MODULES: list[str] = ["mqtt", "nodered", "python311", "pai", "sprinklerd", "aqualinkd"]
->>>>>>> b636e19 (Add nodeRED module)
 
 # child -> [parents it depends on]. A child is only ever auto-enabled when
 # something that needs it is enabled; it is never enabled "just because".

@@ -65,7 +65,7 @@ class MqttModule(Module):
             if not listener_found and listener:
                 lines.append(f"listener {listener}\n")
             if not anonymous_found and allow_anonymous:
-                lines.append(f"allow_anonymous {allow_anonymous}\n")
+                lines.append(f"allow_anonymous true\n")
                 
             with open(config_path, "w") as f:
                 f.writelines(lines)
