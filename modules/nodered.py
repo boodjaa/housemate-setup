@@ -72,16 +72,10 @@ class NoderedModule(Module):
             self.runner.run(["chmod", "755", str(Path(tmp))])
             self.runner.run(["chmod", "644", script_path])
 
-            # Drop from root to the original user for the actual install.
-            # runuser is the right tool here: it switches user identity when
-            # already running as root, without requiring a password (unlike su).
-            #
-            # --confirm-install : skip the interactive "are you sure?" prompt
-            # --node20          : pin the Node.js LTS major version
             self.runner.run(
                 [
                     "runuser", "-u", user, "--",
-                    "bash", script_path, "--confirm-install", "--node20",
+                    "bash", script_path, "--confirm-install", "--confirm-pi",
                 ],
                 timeout=1800,   # installs Node.js + npm packages; can be slow
             )
