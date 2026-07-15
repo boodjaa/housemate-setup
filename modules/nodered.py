@@ -98,10 +98,12 @@ class NoderedModule(Module):
             dest = Path("/home/admin/.node-red") / "flows.json"
 
             if dest.exists:
-                self.logger.log(f"Skipped {str(src)}... flows.json already exists.")
+                self.logger.info(f"Skipped {str(src)}... flows.json already exists.")
             else:
                 shutil.copy2(src, dest)
-                self.logger.log(f"Copied {str(src)} to {str(dest)}.")
+                self.logger.info(f"Copied {str(src)} to {str(dest)}.")
+        else:
+            self.logger.info("No flows.json provided. Not configuring.")
 
     def _ensure_plugin(self, plugin_name: str) -> None:
         try:
