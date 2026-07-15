@@ -44,7 +44,6 @@ class NoderedModule(Module):
     def install(self) -> None:
         if self._is_installed():
             self.logger.info("node-red already installed, updating...")
-            return
 
         user = self._invoking_user()
         if user is None:
