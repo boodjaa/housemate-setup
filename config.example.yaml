@@ -56,7 +56,7 @@ mqtt:
 
 nodered:
   enabled: true
-  flows: flows-example.json   # File should be in same directory as setup.py
+  flows: flows-example.json   # File should be in same directory as setup.py. Comment out ENTIRE LINE of not importing.
   plugins:
     node-red-contrib-homebridge-automation:
       enabled: true
