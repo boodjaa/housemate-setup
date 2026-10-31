@@ -688,21 +688,21 @@ def render_summary(results: LintResults, strict: bool) -> int:
     warnings = len(results.warnings)
 
     if errors == 0 and warnings == 0:
-        console.print("  [bold green]✓ All good — no issues found.[/bold green]\n")
+        console.print("  [bold green]✓ No issues found. Proceed to installation[/bold green]\n")
         return 0
 
     parts = []
     if errors:
-        parts.append(f"[bold red]{errors} error{'s' if errors != 1 else ''}[/bold red]")
+        parts.append(f"[bold red]{errors} error{'s' if errors != 1 else ''} generated[/bold red]")
     if warnings:
-        parts.append(f"[bold yellow]{warnings} warning{'s' if warnings != 1 else ''}[/bold yellow]")
+        parts.append(f"[bold yellow]{warnings} warning{'s' if warnings != 1 else ''} generated[/bold yellow]")
     console.print("  " + ", ".join(parts))
 
     if errors or (strict and warnings):
         console.print("  [red]Fix errors before running setup.py[/red]\n")
         return 2
     else:
-        console.print("  [yellow]Warnings are advisory — setup.py will still run[/yellow]\n")
+        console.print("  [yellow]Warnings are advisory — setup.py may produce incorrect results\n")
         return 1
 
 
