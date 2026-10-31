@@ -164,7 +164,7 @@ _MQTTTHING_TYPES: dict[str, set[str]] = {
 # Plugins in the framework's registry (for install-only detection)
 _KNOWN_PLUGINS = {
     "homebridge-mqttthing", "homebridge-daikin-local", "homebridge-ueboom",
-    "homebridge-denon-tv", "homebridge-shelly", "homebridge-kasa-python",
+    "homebridge-denon-tv", "homebridge-shelly", "homebridge-2-0-shelly", "homebridge-kasa-python",
     "homebridge-google-smarthome", "homebridge-landroid", "homebridge-appletv-enhanced",
     "homebridge-google-nest-sdm", "homebridge-broadlink-rm", "homebridge-connexoon",
     "homebridge-tahoma", "homebridge-camera-ffmpeg", "homebridge-plex",
